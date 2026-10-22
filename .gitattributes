@@ -1,0 +1,5 @@
+# Normalise line endings so content hashes and line numbers are identical on
+# Windows checkouts and Linux CI runners.
+* text=auto eol=lf
+*.pks text eol=lf
+*.pkb text eol=lf

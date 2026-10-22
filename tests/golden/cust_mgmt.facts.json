@@ -1,0 +1,286 @@
+{
+  "body_line_count": 90,
+  "body_path": "plsql/customers/cust_mgmt.pkb",
+  "dependencies": [
+    "UTIL_LOG"
+  ],
+  "globals": [
+    {
+      "constant": true,
+      "line": 3,
+      "location": "body",
+      "name": "C_SRC",
+      "type": "VARCHAR2(30)",
+      "value": "'CUST_MGMT'"
+    }
+  ],
+  "name": "CUST_MGMT",
+  "source_hash": "e26585a0d16c3c50a9789da87f855ab51ead1027f7d2628ec29bdab83f2ee9a5",
+  "spec_line_count": 22,
+  "spec_path": "plsql/customers/cust_mgmt.pks",
+  "subprograms": [
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 26,
+      "internal_calls": [],
+      "kind": "FUNCTION",
+      "name": "GET_CST_LVL",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_CST_ID",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": "VARCHAR2",
+      "sequences": [],
+      "spec_line": 8,
+      "start_line": 5,
+      "tables": [
+        {
+          "aliases": [
+            "H"
+          ],
+          "lines": [
+            13
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "CST_HIST"
+        },
+        {
+          "aliases": [
+            "C"
+          ],
+          "lines": [
+            12
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "CST_MSTR"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            54
+          ],
+          "member": "LOG_MSG",
+          "package": "UTIL_LOG"
+        }
+      ],
+      "dynamic_sql": false,
+      "end_line": 55,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "UPD_CST_STAT",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_CST_ID",
+          "type": "NUMBER"
+        },
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_NEW_CD",
+          "type": "VARCHAR2"
+        },
+        {
+          "default": "USER",
+          "mode": "IN",
+          "name": "P_USR",
+          "type": "VARCHAR2"
+        }
+      ],
+      "raises": [
+        {
+          "code": -20031,
+          "line": 42,
+          "message": "'Customer ' || p_cst_id || ' is closed'"
+        }
+      ],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": 10,
+      "start_line": 28,
+      "tables": [
+        {
+          "aliases": [
+            "M"
+          ],
+          "lines": [
+            37,
+            45
+          ],
+          "operations": [
+            "SELECT",
+            "UPDATE"
+          ],
+          "table": "CST_MSTR"
+        },
+        {
+          "aliases": [],
+          "lines": [
+            51
+          ],
+          "operations": [
+            "INSERT"
+          ],
+          "table": "CST_STAT_HIST"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 77,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "CHK_CST_XFL",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_CST_ID",
+          "type": "NUMBER"
+        },
+        {
+          "default": null,
+          "mode": "OUT",
+          "name": "P_XFL",
+          "type": "VARCHAR2"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": 16,
+      "start_line": 57,
+      "tables": [
+        {
+          "aliases": [],
+          "lines": [
+            67
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "CST_MSTR"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 87,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "REBUILD_CST_IDX",
+      "parameters": [],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": null,
+      "start_line": 79,
+      "tables": [
+        {
+          "aliases": [],
+          "lines": [
+            81,
+            82
+          ],
+          "operations": [
+            "INSERT",
+            "DELETE"
+          ],
+          "table": "CST_IDX"
+        },
+        {
+          "aliases": [],
+          "lines": [
+            84
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "CST_MSTR"
+        }
+      ],
+      "visibility": "private"
+    }
+  ],
+  "tables": [
+    {
+      "aliases": [
+        "H"
+      ],
+      "lines": [
+        13
+      ],
+      "operations": [
+        "SELECT"
+      ],
+      "table": "CST_HIST"
+    },
+    {
+      "aliases": [],
+      "lines": [
+        81,
+        82
+      ],
+      "operations": [
+        "INSERT",
+        "DELETE"
+      ],
+      "table": "CST_IDX"
+    },
+    {
+      "aliases": [
+        "C",
+        "M"
+      ],
+      "lines": [
+        12,
+        37,
+        45,
+        67,
+        84
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE"
+      ],
+      "table": "CST_MSTR"
+    },
+    {
+      "aliases": [],
+      "lines": [
+        51
+      ],
+      "operations": [
+        "INSERT"
+      ],
+      "table": "CST_STAT_HIST"
+    }
+  ],
+  "warnings": [
+    "REBUILD_CST_IDX is private and never called within the package (possible dead code)"
+  ]
+}

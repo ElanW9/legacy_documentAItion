@@ -1,0 +1,98 @@
+{
+  "body_line_count": 24,
+  "body_path": "plsql/util/util_log.pkb",
+  "dependencies": [],
+  "globals": [],
+  "name": "UTIL_LOG",
+  "source_hash": "792de712f1960f9e20f2de864e29bde1ac45b5439ea27a3c99d854aa8c318819",
+  "spec_line_count": 16,
+  "spec_path": "plsql/util/util_log.pks",
+  "subprograms": [
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 16,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "LOG_MSG",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_LVL",
+          "type": "VARCHAR2"
+        },
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_SRC",
+          "type": "VARCHAR2"
+        },
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_TXT",
+          "type": "VARCHAR2"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [
+        "APP_LOG_SEQ"
+      ],
+      "spec_line": 7,
+      "start_line": 3,
+      "tables": [
+        {
+          "aliases": [],
+          "lines": [
+            10
+          ],
+          "operations": [
+            "INSERT"
+          ],
+          "table": "APP_LOG"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 21,
+      "internal_calls": [],
+      "kind": "FUNCTION",
+      "name": "FMT_AMT",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_AMT",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": "VARCHAR2",
+      "sequences": [],
+      "spec_line": 13,
+      "start_line": 18,
+      "tables": [],
+      "visibility": "public"
+    }
+  ],
+  "tables": [
+    {
+      "aliases": [],
+      "lines": [
+        10
+      ],
+      "operations": [
+        "INSERT"
+      ],
+      "table": "APP_LOG"
+    }
+  ],
+  "warnings": []
+}

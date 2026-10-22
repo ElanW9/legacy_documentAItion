@@ -1,0 +1,424 @@
+{
+  "body_line_count": 154,
+  "body_path": "plsql/orders/ord_proc.pkb",
+  "dependencies": [
+    "BILL_CALC",
+    "CUST_MGMT",
+    "UTIL_LOG"
+  ],
+  "globals": [
+    {
+      "constant": true,
+      "line": 9,
+      "location": "spec",
+      "name": "G_MAX_LINES",
+      "type": "PLS_INTEGER",
+      "value": "250"
+    },
+    {
+      "constant": true,
+      "line": 3,
+      "location": "body",
+      "name": "C_SRC",
+      "type": "VARCHAR2(30)",
+      "value": "'ORD_PROC'"
+    },
+    {
+      "constant": true,
+      "line": 4,
+      "location": "body",
+      "name": "C_ALLOW_PARTIAL",
+      "type": "BOOLEAN",
+      "value": "FALSE"
+    }
+  ],
+  "name": "ORD_PROC",
+  "source_hash": "1cc353c91a648bba47c83e0e37cba866a517fdb1a13ddfdf4a13c9dce042a2cd",
+  "spec_line_count": 26,
+  "spec_path": "plsql/orders/ord_proc.pks",
+  "subprograms": [
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            20
+          ],
+          "member": "GET_CST_LVL",
+          "package": "CUST_MGMT"
+        }
+      ],
+      "dynamic_sql": false,
+      "end_line": 34,
+      "internal_calls": [],
+      "kind": "FUNCTION",
+      "name": "CALC_DISC_PCT",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_ORD_ID",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [
+        "SUBMIT_ORDER"
+      ],
+      "return_type": "NUMBER",
+      "sequences": [],
+      "spec_line": 11,
+      "start_line": 6,
+      "tables": [
+        {
+          "aliases": [
+            "H"
+          ],
+          "lines": [
+            15
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "ORD_HDR"
+        },
+        {
+          "aliases": [
+            "L"
+          ],
+          "lines": [
+            15
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "ORD_LINE"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            62
+          ],
+          "member": "CHK_CST_XFL",
+          "package": "CUST_MGMT"
+        }
+      ],
+      "dynamic_sql": false,
+      "end_line": 66,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "VALIDATE_ORDER",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_ORD_ID",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [
+        {
+          "code": -20101,
+          "line": 48,
+          "message": "'Order ' || p_ord_id || ' not in status N'"
+        },
+        {
+          "code": -20102,
+          "line": 57,
+          "message": "'Order ' || p_ord_id || ' has no lines'"
+        },
+        {
+          "code": -20103,
+          "line": 59,
+          "message": "'Order ' || p_ord_id || ' has too many lines'"
+        },
+        {
+          "code": -20104,
+          "line": 64,
+          "message": "'Customer ' || v_cst || ' xfl=P'"
+        }
+      ],
+      "referenced_by": [
+        "SUBMIT_ORDER"
+      ],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": null,
+      "start_line": 36,
+      "tables": [
+        {
+          "aliases": [],
+          "lines": [
+            44
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "ORD_HDR"
+        },
+        {
+          "aliases": [],
+          "lines": [
+            53
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "ORD_LINE"
+        }
+      ],
+      "visibility": "private"
+    },
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            86
+          ],
+          "member": "CREATE_INVOICE",
+          "package": "BILL_CALC"
+        },
+        {
+          "kind": "repo",
+          "lines": [
+            96
+          ],
+          "member": "LOG_MSG",
+          "package": "UTIL_LOG"
+        }
+      ],
+      "dynamic_sql": false,
+      "end_line": 97,
+      "internal_calls": [
+        "CALC_DISC_PCT",
+        "VALIDATE_ORDER"
+      ],
+      "kind": "PROCEDURE",
+      "name": "SUBMIT_ORDER",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_ORD_ID",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": 13,
+      "start_line": 68,
+      "tables": [
+        {
+          "aliases": [],
+          "lines": [
+            80,
+            87
+          ],
+          "operations": [
+            "UPDATE"
+          ],
+          "table": "ORD_HDR"
+        },
+        {
+          "aliases": [],
+          "lines": [
+            76
+          ],
+          "operations": [
+            "UPDATE"
+          ],
+          "table": "ORD_LINE"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            125
+          ],
+          "member": "LOG_MSG",
+          "package": "UTIL_LOG"
+        }
+      ],
+      "dynamic_sql": false,
+      "end_line": 126,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "CANCEL_ORDER",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_ORD_ID",
+          "type": "NUMBER"
+        },
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_RSN_CD",
+          "type": "VARCHAR2"
+        }
+      ],
+      "raises": [
+        {
+          "code": -20111,
+          "line": 122,
+          "message": "'Order ' || p_ord_id || ' cannot be cancelled in status ' || v_stat"
+        }
+      ],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": 15,
+      "start_line": 99,
+      "tables": [
+        {
+          "aliases": [],
+          "lines": [
+            107,
+            112
+          ],
+          "operations": [
+            "SELECT",
+            "UPDATE"
+          ],
+          "table": "ORD_HDR"
+        },
+        {
+          "aliases": [],
+          "lines": [
+            117
+          ],
+          "operations": [
+            "UPDATE"
+          ],
+          "table": "ORD_LINE"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            150
+          ],
+          "member": "LOG_MSG",
+          "package": "UTIL_LOG"
+        }
+      ],
+      "dynamic_sql": true,
+      "end_line": 151,
+      "internal_calls": [],
+      "kind": "PROCEDURE",
+      "name": "ARCHIVE_ORDERS",
+      "parameters": [
+        {
+          "default": "730",
+          "mode": "IN",
+          "name": "P_KEEP_DAYS",
+          "type": "PLS_INTEGER"
+        },
+        {
+          "default": null,
+          "mode": "OUT",
+          "name": "P_CNT",
+          "type": "PLS_INTEGER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [],
+      "spec_line": 20,
+      "start_line": 128,
+      "tables": [
+        {
+          "aliases": [
+            "OH"
+          ],
+          "lines": [
+            141,
+            146
+          ],
+          "operations": [
+            "SELECT",
+            "DELETE"
+          ],
+          "table": "ORD_HDR"
+        },
+        {
+          "aliases": [
+            "OL"
+          ],
+          "lines": [
+            139
+          ],
+          "operations": [
+            "DELETE"
+          ],
+          "table": "ORD_LINE"
+        }
+      ],
+      "visibility": "public"
+    }
+  ],
+  "tables": [
+    {
+      "aliases": [
+        "H",
+        "OH"
+      ],
+      "lines": [
+        15,
+        44,
+        80,
+        87,
+        107,
+        112,
+        141,
+        146
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "DELETE"
+      ],
+      "table": "ORD_HDR"
+    },
+    {
+      "aliases": [
+        "L",
+        "OL"
+      ],
+      "lines": [
+        15,
+        53,
+        76,
+        117,
+        139
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "DELETE"
+      ],
+      "table": "ORD_LINE"
+    }
+  ],
+  "warnings": [
+    "ARCHIVE_ORDERS uses dynamic SQL; tables accessed through it are not listed"
+  ]
+}

@@ -1,0 +1,139 @@
+# Ground truth for the seeded traps in plsql/.
+#
+# Each trap is located by `package` + `procedure` + `anchor` (a regex that must
+# match exactly one line inside that procedure; enforced by
+# tests/test_ground_truth.py), so line numbers are never hardcoded here.
+#
+# Detection: the trap counts as FOUND when at least one item in one of the
+# `expect_in` fields of the generated UnitDoc matches *every* regex in
+# `match_all` (case-insensitive). For `business_rules`, the rule must also be
+# `implemented_in` the trap's procedure; whether its evidence_lines cover the
+# anchor line is reported separately as evidence accuracy.
+#
+# `forbid_in_rules`: regexes that must NOT appear in any business rule
+# implemented_in the trap's procedure (e.g. commented-out logic documented as
+# if it were live). A hit is reported as a hallucination.
+#
+# Valid expect_in fields: business_rules, open_questions, edge_cases,
+# main_flow, procedure_notes.
+
+version: 1
+traps:
+  - id: T1-hidden-case-rule
+    type: hidden_business_rule
+    package: ORD_PROC
+    procedure: CALC_DISC_PCT
+    anchor: "TO_CHAR\\(SYSDATE, 'MM'\\) = '12'"
+    description: >
+      Inside the discount CASE, level 'S' customers ordering via channel 'W'
+      get 5% only in December (month '12'); otherwise level 'S' gets 3%.
+      The seasonal condition is easy to miss when summarising the CASE.
+    expect_in: [business_rules]
+    match_all:
+      - "december|month\\W{0,3}(is\\W{0,3})?'?12|'12'|12th month"
+      - "\\b5\\b"
+
+  - id: T2a-dead-procedure
+    type: dead_code
+    package: CUST_MGMT
+    procedure: REBUILD_CST_IDX
+    anchor: "DELETE FROM cst_idx"
+    description: >
+      Private procedure that is never called inside the package and cannot be
+      called from outside (not in the spec). Effectively dead code.
+    expect_in: [open_questions]
+    match_all:
+      - "rebuild_cst_idx"
+      - "never (called|invoked|used|referenced)|not (called|invoked|used|referenced)|unused|dead|unreferenced|no caller"
+
+  - id: T2b-unreachable-branch
+    type: dead_code
+    package: ORD_PROC
+    procedure: CANCEL_ORDER
+    anchor: "ELSIF v_stat = 'I' AND c_allow_partial"
+    description: >
+      The partial-cancel branch is guarded by the constant C_ALLOW_PARTIAL,
+      which is FALSE, so the branch can never execute.
+    expect_in: [open_questions]
+    match_all:
+      - "c_allow_partial"
+      - "false|unreachable|never (be )?(execut|run|taken|reached)|dead|always|cannot"
+
+  - id: T3-cross-package-call
+    type: cross_package_call
+    package: ORD_PROC
+    procedure: SUBMIT_ORDER
+    anchor: "bill_calc\\.create_invoice\\(p_ord_id, v_inv_id\\)"
+    description: >
+      Submitting an order creates the invoice via BILL_CALC.CREATE_INVOICE.
+      The flow must mention this hand-off to the billing package.
+    expect_in: [main_flow, procedure_notes]
+    match_all:
+      - "create_invoice"
+
+  - id: T4-magic-number
+    type: magic_number
+    package: BILL_CALC
+    procedure: CALC_LATE_FEE
+    anchor: "IF v_days > 47 THEN"
+    description: >
+      Late fees only apply after 47 days past due date, an unexplained
+      literal (not a named constant, no comment).
+    expect_in: [open_questions]
+    match_all:
+      - "\\b47\\b"
+
+  - id: T5a-swallowed-exception-invoice
+    type: swallowed_exception
+    package: ORD_PROC
+    procedure: SUBMIT_ORDER
+    anchor: "^\\s*NULL;"
+    description: >
+      Any error while creating the invoice is swallowed (WHEN OTHERS THEN
+      NULL): the order stays in status 'S' without an invoice and nobody is
+      told. High business impact.
+    expect_in: [open_questions]
+    match_all:
+      - "when others|swallow|silent|ignor|suppress|discard|hidden|unreported|no error"
+      - "invoice"
+
+  - id: T5b-swallowed-exception-logging
+    type: swallowed_exception
+    package: UTIL_LOG
+    procedure: LOG_MSG
+    anchor: "^\\s*NULL;"
+    description: >
+      Logging failures are swallowed (WHEN OTHERS THEN NULL), so log entries
+      can be lost silently.
+    expect_in: [open_questions]
+    match_all:
+      - "when others|swallow|silent|ignor|suppress|discard|lost|unreported"
+
+  - id: T6-cryptic-naming
+    type: cryptic_naming
+    package: CUST_MGMT
+    procedure: CHK_CST_XFL
+    anchor: "p_xfl := 'P';"
+    description: >
+      'xfl' and its values 'Y'/'P'/'N', and customer type 'K', are
+      unexplained abbreviations. The doc should describe the conditions but
+      ask what the flag and codes mean rather than guess.
+    expect_in: [open_questions]
+    match_all:
+      - "xfl"
+      - "mean|stand for|abbreviat|cryptic|unclear|undocumented|not (explained|documented)|purpose|semantic|interpret"
+
+  - id: T7-commented-out-block
+    type: commented_out_logic
+    package: BILL_CALC
+    procedure: CREATE_INVOICE
+    anchor: "v_net := v_net \\* 0\\.95;"
+    description: >
+      A commented-out discount block (labelled 'KMO discount, disabled 2009').
+      It must not be documented as active behaviour, and should be flagged
+      (e.g. leftover code, V_LVL now computed but unused).
+    expect_in: [open_questions]
+    match_all:
+      - "comment|disabled|inactive|legacy|kmo|v_lvl"
+    forbid_in_rules:
+      - "0\\.95|\\b5\\s?%|kmo"

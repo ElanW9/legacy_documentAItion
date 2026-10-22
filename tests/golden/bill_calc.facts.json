@@ -1,0 +1,272 @@
+{
+  "body_line_count": 91,
+  "body_path": "plsql/billing/bill_calc.pkb",
+  "dependencies": [
+    "CUST_MGMT",
+    "UTIL_LOG"
+  ],
+  "globals": [
+    {
+      "constant": true,
+      "line": 3,
+      "location": "body",
+      "name": "C_SRC",
+      "type": "VARCHAR2(30)",
+      "value": "'BILL_CALC'"
+    },
+    {
+      "constant": true,
+      "line": 4,
+      "location": "body",
+      "name": "C_VAT_STD",
+      "type": "NUMBER",
+      "value": "0.21"
+    }
+  ],
+  "name": "BILL_CALC",
+  "source_hash": "fa1791cefe41bce30020d6897a07bd041af9eaad95647296f21d53e72f97d45b",
+  "spec_line_count": 26,
+  "spec_path": "plsql/billing/bill_calc.pks",
+  "subprograms": [
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 14,
+      "internal_calls": [],
+      "kind": "FUNCTION",
+      "name": "CALC_LINE_AMT",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_QTY",
+          "type": "NUMBER"
+        },
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_PRICE",
+          "type": "NUMBER"
+        },
+        {
+          "default": "0",
+          "mode": "IN",
+          "name": "P_DISC",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [
+        "CREATE_INVOICE"
+      ],
+      "return_type": "NUMBER",
+      "sequences": [],
+      "spec_line": 9,
+      "start_line": 6,
+      "tables": [],
+      "visibility": "public"
+    },
+    {
+      "calls": [],
+      "dynamic_sql": false,
+      "end_line": 42,
+      "internal_calls": [],
+      "kind": "FUNCTION",
+      "name": "CALC_LATE_FEE",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_INV_ID",
+          "type": "NUMBER"
+        },
+        {
+          "default": "TRUNC(SYSDATE)",
+          "mode": "IN",
+          "name": "P_REF_DT",
+          "type": "DATE"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": "NUMBER",
+      "sequences": [],
+      "spec_line": 15,
+      "start_line": 16,
+      "tables": [
+        {
+          "aliases": [
+            "I"
+          ],
+          "lines": [
+            27
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "INV_HDR"
+        }
+      ],
+      "visibility": "public"
+    },
+    {
+      "calls": [
+        {
+          "kind": "repo",
+          "lines": [
+            63
+          ],
+          "member": "GET_CST_LVL",
+          "package": "CUST_MGMT"
+        },
+        {
+          "kind": "repo",
+          "lines": [
+            87
+          ],
+          "member": "FMT_AMT",
+          "package": "UTIL_LOG"
+        },
+        {
+          "kind": "repo",
+          "lines": [
+            86
+          ],
+          "member": "LOG_MSG",
+          "package": "UTIL_LOG"
+        }
+      ],
+      "dynamic_sql": false,
+      "end_line": 88,
+      "internal_calls": [
+        "CALC_LINE_AMT"
+      ],
+      "kind": "PROCEDURE",
+      "name": "CREATE_INVOICE",
+      "parameters": [
+        {
+          "default": null,
+          "mode": "IN",
+          "name": "P_ORD_ID",
+          "type": "NUMBER"
+        },
+        {
+          "default": null,
+          "mode": "OUT",
+          "name": "P_INV_ID",
+          "type": "NUMBER"
+        }
+      ],
+      "raises": [],
+      "referenced_by": [],
+      "return_type": null,
+      "sequences": [
+        "INV_SEQ"
+      ],
+      "spec_line": 20,
+      "start_line": 44,
+      "tables": [
+        {
+          "aliases": [
+            "B"
+          ],
+          "lines": [
+            78
+          ],
+          "operations": [
+            "MERGE"
+          ],
+          "table": "CST_BAL"
+        },
+        {
+          "aliases": [],
+          "lines": [
+            74
+          ],
+          "operations": [
+            "INSERT"
+          ],
+          "table": "INV_HDR"
+        },
+        {
+          "aliases": [
+            "O"
+          ],
+          "lines": [
+            54
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "ORD_HDR"
+        },
+        {
+          "aliases": [
+            "L"
+          ],
+          "lines": [
+            58
+          ],
+          "operations": [
+            "SELECT"
+          ],
+          "table": "ORD_LINE"
+        }
+      ],
+      "visibility": "public"
+    }
+  ],
+  "tables": [
+    {
+      "aliases": [
+        "B"
+      ],
+      "lines": [
+        78
+      ],
+      "operations": [
+        "MERGE"
+      ],
+      "table": "CST_BAL"
+    },
+    {
+      "aliases": [
+        "I"
+      ],
+      "lines": [
+        27,
+        74
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT"
+      ],
+      "table": "INV_HDR"
+    },
+    {
+      "aliases": [
+        "O"
+      ],
+      "lines": [
+        54
+      ],
+      "operations": [
+        "SELECT"
+      ],
+      "table": "ORD_HDR"
+    },
+    {
+      "aliases": [
+        "L"
+      ],
+      "lines": [
+        58
+      ],
+      "operations": [
+        "SELECT"
+      ],
+      "table": "ORD_LINE"
+    }
+  ],
+  "warnings": []
+}
