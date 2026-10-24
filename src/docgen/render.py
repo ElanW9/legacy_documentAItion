@@ -17,6 +17,8 @@ from docgen.models import PackageFacts, Subprogram, UnitDoc
 
 BANNER_TEXT = "DRAFT, AI-generated, needs functional review"
 LABELS = ("ai-generated",)
+# Bump when the page layout changes, so unchanged packages are re-rendered.
+RENDER_VERSION = "1"
 
 
 @dataclass(frozen=True)

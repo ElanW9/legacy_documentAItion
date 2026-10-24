@@ -36,8 +36,14 @@ class Settings(BaseSettings):
     llm_max_retries: int = Field(default=5, ge=0)
     llm_backoff_base_s: float = Field(default=2.0, gt=0)
     llm_backoff_max_s: float = Field(default=60.0, gt=0)
+    llm_timeout_s: float = Field(default=180.0, gt=0)
+    # None = model default. Google recommends the default (1.0) for Gemini 3 models.
+    llm_temperature: float | None = Field(default=None, ge=0, le=2)
+    gemini_thinking_level: Literal["minimal", "low", "medium", "high"] | None = None
     # Packages whose body exceeds this many lines are documented per procedure.
     chunk_threshold_lines: int = Field(default=150, ge=1)
+    # Local cache of validated LLM answers, keyed by a hash of the full request.
+    cache_dir: Path = Path(".cache/docgen")
 
     # --- Confluence ----------------------------------------------------------
     publish_mode: Literal["rest", "mcp"] = "rest"
