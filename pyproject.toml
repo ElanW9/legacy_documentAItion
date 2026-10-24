@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "AI-generated, code-grounded documentation for legacy PL/SQL, published to Confluence"
 requires-python = ">=3.12"
 dependencies = [
+    "google-genai==2.33.0",
     "httpx==0.28.1",
     "pydantic==2.14.1",
     "pydantic-settings==2.16.1",
@@ -26,6 +27,11 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+filterwarnings = [
+    "error",
+    # google-genai 2.33.0 on Python 3.14; third-party, harmless until Python 3.17.
+    "ignore:'_UnionGenericAlias' is deprecated:DeprecationWarning",
+]
 
 [tool.ruff]
 line-length = 100

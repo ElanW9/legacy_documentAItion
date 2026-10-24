@@ -19,6 +19,7 @@ htmlcov/
 # --- Run outputs ---
 out/
 report.md
+.cache/
 
 # --- Editors / OS ---
 .vscode/
