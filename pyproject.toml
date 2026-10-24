@@ -8,7 +8,9 @@ version = "0.1.0"
 description = "AI-generated, code-grounded documentation for legacy PL/SQL, published to Confluence"
 requires-python = ">=3.12"
 dependencies = [
+    "httpx==0.28.1",
     "pydantic==2.14.1",
+    "pydantic-settings==2.16.1",
     "PyYAML==6.0.3",
 ]
 

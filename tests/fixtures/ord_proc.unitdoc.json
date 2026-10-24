@@ -1,0 +1,29 @@
+{
+  "source_complete": true,
+  "purpose": "Processes orders: computes an order discount percentage, validates and submits orders (including invoice creation), cancels orders, and archives old invoiced or cancelled orders.",
+  "procedure_notes": [
+    {"name": "CALC_DISC_PCT", "summary": "Returns a discount percentage for an order based on customer level, channel code, order total and the current month."},
+    {"name": "VALIDATE_ORDER", "summary": "Raises an error unless the order is in status 'N', has between 1 and g_max_lines lines, and the customer's xfl value is not 'P'."},
+    {"name": "SUBMIT_ORDER", "summary": "Validates the order, applies the discount to all lines, sets status 'S', then tries to create an invoice and set status 'I'."},
+    {"name": "CANCEL_ORDER", "summary": "Cancels orders in status 'N' or 'S' by setting status 'C' and the reason code; other statuses raise an error."},
+    {"name": "ARCHIVE_ORDERS", "summary": "Copies old orders in status 'I' or 'C' to a yearly archive table via dynamic SQL, then deletes them and their lines."}
+  ],
+  "business_rules": [
+    {"rule": "Level 'S' customers ordering through channel 'W' get 5% discount only when the current month is December ('12'); otherwise level 'S' gets 3%.", "implemented_in": "CALC_DISC_PCT", "evidence_lines": [26, 28], "confidence": "high"},
+    {"rule": "Level 'G' customers get 12% when the order total is at least 5000, otherwise 8%.", "implemented_in": "CALC_DISC_PCT", "evidence_lines": [24, 25], "confidence": "high"},
+    {"rule": "Only orders in status 'N' or 'S' can be cancelled.", "implemented_in": "CANCEL_ORDER", "evidence_lines": [111, 122], "confidence": "high"}
+  ],
+  "main_flow": [
+    {"step": 1, "description": "Validate the order.", "implemented_in": "VALIDATE_ORDER"},
+    {"step": 2, "description": "Compute the discount percentage and write it to every order line.", "implemented_in": "CALC_DISC_PCT"},
+    {"step": 3, "description": "Set the order status to 'S' and create the invoice via bill_calc.create_invoice, then set status 'I'.", "implemented_in": "SUBMIT_ORDER"}
+  ],
+  "edge_cases": [
+    "If invoice creation fails, the order remains in status 'S' without an invoice."
+  ],
+  "open_questions": [
+    "SUBMIT_ORDER swallows every error from invoice creation (WHEN OTHERS THEN NULL); is silently leaving the order uninvoiced intended?",
+    "The partial-cancel branch in CANCEL_ORDER depends on c_allow_partial, which is the constant FALSE, so it can never run. Can it be removed?",
+    "What do customer levels 'G' and 'S' and channel 'W' stand for?"
+  ]
+}

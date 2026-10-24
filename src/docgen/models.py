@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 SqlOperation = Literal["SELECT", "INSERT", "UPDATE", "DELETE", "MERGE"]
 ParamMode = Literal["IN", "OUT", "IN OUT"]
@@ -99,3 +99,52 @@ class PackageFacts(_Frozen):
 
     def subprogram_names(self) -> list[str]:
         return [s.name for s in self.subprograms]
+
+
+# --------------------------------------------------------------------------- LLM output
+#
+# The LLM returns *only* this structure (validated JSON). It never produces
+# markup and never restates FACTS; the renderer combines both.
+
+Confidence = Literal["high", "medium", "low"]
+
+
+class BusinessRule(_Frozen):
+    rule: str = Field(min_length=1)
+    implemented_in: str = Field(min_length=1, description="Exact procedure/function name")
+    evidence_lines: tuple[int, int] = Field(description="Inclusive [start, end] SOURCE lines")
+    confidence: Confidence
+
+    @field_validator("evidence_lines")
+    @classmethod
+    def _ordered_positive(cls, v: tuple[int, int]) -> tuple[int, int]:
+        start, end = v
+        if start < 1 or end < start:
+            raise ValueError("evidence_lines must be [start, end] with 1 <= start <= end")
+        return v
+
+
+class FlowStep(_Frozen):
+    step: int = Field(ge=1)
+    description: str = Field(min_length=1)
+    implemented_in: str | None
+
+
+class ProcedureNote(_Frozen):
+    name: str = Field(min_length=1)
+    summary: str = Field(min_length=1)
+
+
+class UnitDoc(_Frozen):
+    """Documentation for one unit (a package, or one procedure in chunked mode).
+
+    List fields are required and must be lists (possibly empty), never null.
+    """
+
+    source_complete: bool
+    purpose: str
+    procedure_notes: list[ProcedureNote]
+    business_rules: list[BusinessRule]
+    main_flow: list[FlowStep]
+    edge_cases: list[str]
+    open_questions: list[str]
