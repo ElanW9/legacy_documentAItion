@@ -15,6 +15,6 @@ Rules:
 6. `edge_cases` and `open_questions`: the union of the unit docs' items with duplicates removed. Do not drop open questions.
 7. If unit docs contradict each other (for example, different meanings for the same code value or status), keep both statements and add an open question describing the conflict.
 8. Set `source_complete` to false if any unit doc has `source_complete` false.
-9. Quote identifiers exactly as written in <unit_docs> or <facts>. Never introduce an identifier that appears in neither.
+9. Quote identifiers exactly as written in <unit_docs> or <facts>. Never introduce an identifier that appears in neither. Never expand or interpret abbreviations or codes that the unit docs leave unexplained.
 10. Use empty lists rather than omitting fields. Do not use Markdown or HTML in any field.
 11. Return only the JSON object that matches the schema. No preamble, no code fences.

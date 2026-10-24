@@ -31,7 +31,7 @@ def _gen(client, suffix="cust_mgmt", threshold=1000, cache=None):
 
 
 def test_prompts_load_and_fingerprint_changes():
-    assert PROMPTS.version == "v1"
+    assert PROMPTS.version == (REPO_ROOT / "prompts" / "VERSION").read_text().strip()
     assert "functional analysts" in PROMPTS.system
     edited = Prompts(PROMPTS.version, PROMPTS.system + " ", PROMPTS.synthesis)
     assert edited.fingerprint != PROMPTS.fingerprint

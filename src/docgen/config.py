@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr, field_validator, model_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -67,6 +67,11 @@ class Settings(BaseSettings):
         v = v.strip().removeprefix("https://").removeprefix("http://").rstrip("/")
         return v.removesuffix("/wiki")
 
+    @field_validator("llm_provider", "publish_mode", "gemini_thinking_level", mode="before")
+    @classmethod
+    def _lowercase_choice(cls, v: object) -> object:
+        return v.strip().lower() if isinstance(v, str) else v
+
     @field_validator("gemini_model", "confluence_space", "confluence_parent_id", "source_base_url")
     @classmethod
     def _blank_is_none(cls, v: str | None) -> str | None:
@@ -105,6 +110,22 @@ class Settings(BaseSettings):
                 "confluence_parent_id",
             ],
         )
+
+    @classmethod
+    def load(cls) -> Settings:
+        """Construct from the environment / .env; invalid values raise SettingsError.
+
+        pydantic's own message includes the offending input value, so it is
+        rebuilt here from field names and reasons only.
+        """
+        try:
+            return cls()
+        except ValidationError as exc:
+            problems = "; ".join(
+                f"{'.'.join(str(p) for p in e['loc']).upper()}: {e['msg']}"
+                for e in exc.errors(include_url=False, include_input=False)
+            )
+            raise SettingsError(f"Invalid configuration: {problems}") from None
 
     @property
     def confluence_base_url(self) -> str:

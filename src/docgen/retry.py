@@ -50,10 +50,12 @@ def call_with_retry[T](
             if not decision.retry or attempt >= policy.max_retries:
                 raise
             delay = policy.delay(attempt, decision.retry_after_s, rng)
+            # Messages of our exception types carry status codes, never credentials.
             log.warning(
-                "%s failed (%s); retry %d/%d in %.1fs",
+                "%s failed (%s: %.200s); retry %d/%d in %.1fs",
                 what,
                 type(exc).__name__,
+                str(exc),
                 attempt + 1,
                 policy.max_retries,
                 delay,

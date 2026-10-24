@@ -51,7 +51,7 @@ def main(argv: list[str] | None = None) -> int:
 
     root = Path.cwd().resolve()
     try:
-        settings = Settings()
+        settings = Settings.load()
         settings.require_llm()
         if not args.dry_run:
             settings.require_publish()

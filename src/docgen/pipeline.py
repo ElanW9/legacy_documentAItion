@@ -14,16 +14,14 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
-import re
 import subprocess
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from html import unescape
 from pathlib import Path
 from typing import Literal
 
-from docgen.checks import CheckResult, check_page_coverage, run_checks
+from docgen.checks import CheckResult, check_page_coverage, run_checks, visible_text
 from docgen.config import Settings
 from docgen.extract import (
     PackageFiles,
@@ -197,7 +195,7 @@ def process_package(
             source_base_url=settings.source_base_url,
         )
         page = render_page(facts, checked.doc, meta)
-        checked.findings.extend(check_page_coverage(facts, _visible_text(page)))
+        checked.findings.extend(check_page_coverage(facts, visible_text(page)))
         outcome.checks = checked
         page = render_page(facts, checked.doc, meta, quality_notes=checked.quality_notes())
 
@@ -226,10 +224,6 @@ def process_package(
         log.error("%s: failed: %s", outcome.label, outcome.error)
         log.debug("traceback", exc_info=True)
     return outcome
-
-
-def _visible_text(xhtml: str) -> str:
-    return unescape(re.sub(r"<[^>]+>", " ", xhtml))
 
 
 def run(

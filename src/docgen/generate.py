@@ -221,6 +221,7 @@ def generate_package_doc(
     if lines and lines[-1] == "":
         lines = lines[:-1]
     calls: list[LLMCallRecord] = []
+    schema_model = UnitDoc if prompts.schema_in_prompt else None
 
     def run(unit: str, purpose: Literal["unit", "synthesis"], system: str, user: str) -> UnitDoc:
         try:
@@ -241,7 +242,7 @@ def generate_package_doc(
             kind="package",
             facts=_facts_for_llm(facts),
             source=number_lines(lines, 1, len(lines)),
-            model=UnitDoc,
+            model=schema_model,
         )
         return GenerationResult(run(facts.name, "unit", prompts.system, user), "whole", calls)
 
@@ -253,7 +254,7 @@ def generate_package_doc(
             kind=f"{sub.kind.lower()} of package {facts.name}",
             facts=_facts_for_subprogram(facts, sub),
             source=_chunk_source(lines, facts, sub),
-            model=UnitDoc,
+            model=schema_model,
         )
         unit_docs[sub.name] = run(unit, "unit", prompts.system, user)
 
@@ -263,7 +264,7 @@ def generate_package_doc(
         unit_docs=[
             {"subprogram": name, **d.model_dump(mode="json")} for name, d in unit_docs.items()
         ],
-        model=UnitDoc,
+        model=schema_model,
     )
     doc = run(facts.name, "synthesis", prompts.synthesis, user)
     return GenerationResult(doc, "chunked", calls, unit_docs)
