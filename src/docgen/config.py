@@ -30,9 +30,13 @@ class Settings(BaseSettings):
     )
 
     # --- LLM -----------------------------------------------------------------
-    llm_provider: Literal["gemini", "fake"] = "gemini"
+    llm_provider: Literal["gemini", "openrouter", "fake"] = "gemini"
     gemini_api_key: SecretStr | None = None
     gemini_model: str | None = None
+    # Second provider (OpenAI-compatible API), for comparison and as a fallback.
+    openrouter_api_key: SecretStr | None = None
+    openrouter_model: str | None = None
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
     llm_max_retries: int = Field(default=5, ge=0)
     llm_backoff_base_s: float = Field(default=2.0, gt=0)
     llm_backoff_max_s: float = Field(default=60.0, gt=0)
@@ -76,7 +80,13 @@ class Settings(BaseSettings):
     def _lowercase_choice(cls, v: object) -> object:
         return v.strip().lower() if isinstance(v, str) else v
 
-    @field_validator("gemini_model", "confluence_space", "confluence_parent_id", "source_base_url")
+    @field_validator(
+        "gemini_model",
+        "openrouter_model",
+        "confluence_space",
+        "confluence_parent_id",
+        "source_base_url",
+    )
     @classmethod
     def _blank_is_none(cls, v: str | None) -> str | None:
         return v.strip() if v and v.strip() else None
@@ -102,6 +112,8 @@ class Settings(BaseSettings):
     def require_llm(self) -> None:
         if self.llm_provider == "gemini":
             self._require("the Gemini LLM", ["gemini_api_key", "gemini_model"])
+        elif self.llm_provider == "openrouter":
+            self._require("the OpenRouter LLM", ["openrouter_api_key", "openrouter_model"])
 
     def require_publish(self) -> None:
         self._require(

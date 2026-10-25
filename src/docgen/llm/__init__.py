@@ -19,6 +19,10 @@ def make_llm_client(settings: Settings) -> LLMClient:
     settings.require_llm()
     if settings.llm_provider == "fake":
         return FakeLLMClient()
+    if settings.llm_provider == "openrouter":
+        from docgen.llm.openrouter import OpenRouterClient
+
+        return OpenRouterClient(settings)
     from docgen.llm.gemini import GeminiClient  # keep the SDK import off the offline path
 
     return GeminiClient(settings)
