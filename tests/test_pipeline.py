@@ -12,7 +12,7 @@ import pytest
 from docgen.__main__ import main
 from docgen.config import Settings
 from docgen.generate import ResponseCache
-from docgen.llm import FakeLLMClient
+from docgen.llm import FakeLLMClient, OverloadedError
 from docgen.llm.fake import default_doc_from_user_message
 from docgen.pipeline import all_packages, cache_key, run, select_packages
 from docgen.prompts import load_prompts
@@ -140,6 +140,31 @@ def test_one_failing_package_does_not_stop_the_run():
     report = render_report(result)
     assert "**FAILED**" in report and "## Failures" in report
     assert "failed schema validation twice" in report
+
+
+def test_unavailable_model_stops_calls_for_the_rest_of_the_run():
+    pub = MemoryPublisher()
+    sel = all_packages(root=REPO_ROOT, plsql_root=SETTINGS.plsql_root)
+    _run(sel, pub)  # every page exists and is up to date
+    changed = sel.packages[1].body
+    assert changed is not None
+
+    def overloaded(system, user):
+        raise OverloadedError("Gemini API error 503 UNAVAILABLE: high demand")
+
+    client = FakeLLMClient(responder=overloaded)
+    result = _run(sel, pub, client=client, force=True)
+    statuses = [o.status for o in result.outcomes]
+    assert statuses[0] == "failed" and result.outcomes[0].provider_unavailable
+    assert statuses[1:] == ["not_attempted"] * (len(sel.packages) - 1)
+    assert len(client.calls) == 1  # no requests after the first failure
+
+    # Unchanged packages are still skipped (no model needed); changed ones wait.
+    no_force = _run(sel, pub, client=FakeLLMClient(responder=overloaded))
+    assert {o.status for o in no_force.outcomes} == {"skipped"}
+
+    report = render_report(result)
+    assert "1 failed, 3 not attempted" in report and "**NOT ATTEMPTED**" in report
 
 
 def test_check_findings_reach_page_and_report():

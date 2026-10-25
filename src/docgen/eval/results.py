@@ -52,6 +52,8 @@ class PackageEval(BaseModel):
     raw_doc: UnitDoc | None = None  # model output (validated) before checks
     doc: UnitDoc | None = None  # after checks: what would be published
     unit_docs: dict[str, UnitDoc] = Field(default_factory=dict)  # chunked mode
+    # Failed because the model was overloaded / out of quota (not a quality failure).
+    provider_unavailable: bool = False
 
 
 class TrapResult(BaseModel):

@@ -34,6 +34,19 @@ def test_retry_after_is_respected_and_capped():
     assert p.delay(0, 999, lambda: 0.0) == 30
 
 
+def test_decision_can_lower_the_retry_limit():
+    sleeps: list[float] = []
+    with pytest.raises(Boom):
+        call_with_retry(
+            lambda: (_ for _ in ()).throw(Boom()),
+            classify=lambda e: RetryDecision(True, max_retries=1),
+            policy=RetryPolicy(max_retries=5),
+            what="t",
+            sleep=sleeps.append,
+        )
+    assert len(sleeps) == 1
+
+
 def test_min_delay_is_a_floor_not_a_cap():
     p = RetryPolicy(base_s=1, cap_s=60)
     assert p.delay(0, None, lambda: 0.0, min_delay_s=30) == 30

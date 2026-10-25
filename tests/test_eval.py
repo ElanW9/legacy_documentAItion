@@ -16,7 +16,7 @@ from docgen.eval.results import EvalRun, PackageEval, load_runs, save_run
 from docgen.eval.scoring import anchor_line, find_trap, score_trap
 from docgen.extract import extract_package, find_all_packages, known_package_names
 from docgen.generate import ResponseCache
-from docgen.llm import FakeLLMClient
+from docgen.llm import FakeLLMClient, QuotaExhaustedError
 from docgen.llm.fake import default_doc_from_user_message
 from docgen.models import UnitDoc
 from docgen.prompts import load_prompts
@@ -283,3 +283,30 @@ def test_resume_keeps_successful_packages_and_retries_failed():
 
     with pytest.raises(ValueError, match="cannot resume"):
         run_eval(GT, client=FakeLLMClient(model_name="other"), resume=first, **common)
+    low = {**common, "settings": Settings(_env_file=None, llm_provider="fake",
+                                          gemini_thinking_level="low")}  # fmt: skip
+    with pytest.raises(ValueError, match="gemini_thinking_level: None -> 'low'"):
+        run_eval(GT, client=FakeLLMClient(), resume=first, **low)
+
+
+def test_unavailable_model_stops_the_eval_run_and_can_be_resumed():
+    def overloaded(system, user):
+        raise QuotaExhaustedError("Gemini API error 429: daily quota exhausted")
+
+    common = dict(
+        root=REPO_ROOT,
+        settings=Settings(_env_file=None, llm_provider="fake"),
+        prompts=load_prompts(),
+        cache=ResponseCache(None),
+        commit="abc",
+        packages=["CUST_MGMT", "UTIL_LOG"],
+    )
+    client = FakeLLMClient(responder=overloaded)
+    first = run_eval(GT, client=client, now=NOW, **common)
+    assert len(client.calls) == 1
+    cust, util = first.packages
+    assert cust.provider_unavailable and not cust.ok
+    assert not util.ok and util.error.startswith("not attempted") and util.calls == []
+
+    resumed = run_eval(GT, client=FakeLLMClient(), resume=first, **common)
+    assert resumed.summary.failed == 0

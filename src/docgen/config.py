@@ -36,8 +36,10 @@ class Settings(BaseSettings):
     llm_max_retries: int = Field(default=5, ge=0)
     llm_backoff_base_s: float = Field(default=2.0, gt=0)
     llm_backoff_max_s: float = Field(default=60.0, gt=0)
-    # Minimum wait per retry after a 503 "model is overloaded" (spikes last minutes).
-    llm_overload_min_delay_s: float = Field(default=30.0, ge=0)
+    # 503 "model is overloaded": spikes last minutes and, on a free tier, every
+    # rejected request still counts against the daily quota. Few, long waits.
+    llm_overload_min_delay_s: float = Field(default=90.0, ge=0)
+    llm_overload_max_retries: int = Field(default=2, ge=0)
     llm_timeout_s: float = Field(default=180.0, gt=0)
     # None = model default. Google recommends the default (1.0) for Gemini 3 models.
     llm_temperature: float | None = Field(default=None, ge=0, le=2)

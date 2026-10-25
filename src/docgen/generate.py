@@ -22,7 +22,7 @@ from typing import Literal
 from pydantic import ValidationError
 
 from docgen.extract import ExtractedPackage
-from docgen.llm.base import LLMClient, LLMError
+from docgen.llm.base import LLMClient, LLMError, provider_unavailable
 from docgen.models import PackageFacts, Subprogram, UnitDoc
 from docgen.prompts import Prompts, number_lines, synthesis_message, unit_message
 
@@ -32,11 +32,18 @@ Mode = Literal["whole", "chunked", "no_body"]
 
 
 class GenerationError(RuntimeError):
-    """A unit could not be documented. Carries the calls made so far for reporting."""
+    """A unit could not be documented. Carries the calls made so far for reporting.
 
-    def __init__(self, message: str, calls: list[LLMCallRecord]) -> None:
+    `provider_unavailable`: the model is overloaded or out of quota, so the
+    caller should stop calling it for the rest of the run.
+    """
+
+    def __init__(
+        self, message: str, calls: list[LLMCallRecord], *, provider_unavailable: bool = False
+    ) -> None:
         super().__init__(message)
         self.calls = calls
+        self.provider_unavailable = provider_unavailable
 
 
 @dataclass(frozen=True)
@@ -229,9 +236,13 @@ def generate_package_doc(
                 client, system=system, user=user, unit=unit, purpose=purpose, cache=cache
             )
         except GenerationError as exc:
-            raise GenerationError(str(exc), calls + exc.calls) from None
+            raise GenerationError(
+                str(exc), calls + exc.calls, provider_unavailable=exc.provider_unavailable
+            ) from None
         except LLMError as exc:
-            raise GenerationError(f"{unit}: {exc}", calls) from None
+            raise GenerationError(
+                f"{unit}: {exc}", calls, provider_unavailable=provider_unavailable(exc)
+            ) from None
         calls.append(rec)
         return doc
 

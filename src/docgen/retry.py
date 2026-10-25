@@ -40,6 +40,8 @@ class RetryDecision:
     retry_after_s: float | None = None
     # Floor for the delay, e.g. for an overloaded service where seconds won't help.
     min_delay_s: float | None = None
+    # Overrides the policy's max_retries for this kind of error.
+    max_retries: int | None = None
 
 
 def call_with_retry[T](
@@ -58,7 +60,8 @@ def call_with_retry[T](
             return fn(), attempt + 1
         except Exception as exc:
             decision = classify(exc)
-            if not decision.retry or attempt >= policy.max_retries:
+            limit = policy.max_retries if decision.max_retries is None else decision.max_retries
+            if not decision.retry or attempt >= limit:
                 raise
             delay = policy.delay(attempt, decision.retry_after_s, rng, decision.min_delay_s)
             # Messages of our exception types carry status codes, never credentials.
@@ -68,7 +71,7 @@ def call_with_retry[T](
                 type(exc).__name__,
                 str(exc),
                 attempt + 1,
-                policy.max_retries,
+                limit,
                 delay,
             )
             sleep(delay)

@@ -6,8 +6,10 @@ from docgen.llm.base import (
     LLMError,
     LLMResponse,
     OverloadedError,
+    QuotaExhaustedError,
     RateLimitError,
     TransientLLMError,
+    provider_unavailable,
 )
 from docgen.llm.fake import FakeLLMClient
 
@@ -28,7 +30,9 @@ __all__ = [
     "LLMError",
     "LLMResponse",
     "OverloadedError",
+    "QuotaExhaustedError",
     "RateLimitError",
     "TransientLLMError",
     "make_llm_client",
+    "provider_unavailable",
 ]

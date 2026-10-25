@@ -22,7 +22,11 @@ def _tokens(o: PackageOutcome) -> tuple[int, int]:
 def _status(o: PackageOutcome) -> str:
     if o.status == "published":
         return f"{o.action}"
-    return {"skipped": "skipped (unchanged)", "failed": "**FAILED**"}[o.status]
+    return {
+        "skipped": "skipped (unchanged)",
+        "failed": "**FAILED**",
+        "not_attempted": "**NOT ATTEMPTED**",
+    }[o.status]
 
 
 def render_report(r: RunResult) -> str:
@@ -41,13 +45,15 @@ def render_report(r: RunResult) -> str:
     else:
         published = sum(o.status == "published" for o in r.outcomes)
         skipped = sum(o.status == "skipped" for o in r.outcomes)
+        not_attempted = sum(o.status == "not_attempted" for o in r.outcomes)
         tin = sum(_tokens(o)[0] for o in r.outcomes)
         tout = sum(_tokens(o)[1] for o in r.outcomes)
         calls = [c for o in r.outcomes for c in o.calls]
         live = [c for c in calls if not c.cached]
         out += [
             f"**{len(r.outcomes)} package(s): {published} published, {skipped} skipped, "
-            f"{len(r.failed)} failed.** LLM calls: {len(live)} live, "
+            f"{len(r.failed) - not_attempted} failed, {not_attempted} not attempted.** "
+            f"LLM calls: {len(live)} live, "
             f"{len(calls) - len(live)} cached; tokens in/out {tin}/{tout}; "
             f"LLM time {sum(c.latency_s for c in live):.1f}s.",
             "",

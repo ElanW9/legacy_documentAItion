@@ -8,7 +8,7 @@ import pytest
 from google.genai import errors
 
 from docgen.config import Settings
-from docgen.llm.base import LLMError, RateLimitError
+from docgen.llm.base import LLMError, OverloadedError, QuotaExhaustedError, RateLimitError
 from docgen.llm.gemini import GeminiClient
 from docgen.llm.schema import inline_schema
 from docgen.models import UnitDoc
@@ -106,12 +106,20 @@ def test_5xx_is_retried_then_gives_up():
 
 
 def test_503_overloaded_waits_at_least_the_overload_delay():
-    errs = [_api_error(503, "UNAVAILABLE") for _ in range(3)]
+    errs = [_api_error(503, "UNAVAILABLE") for _ in range(2)]
     sleeps: list[float] = []
     c = _client([*errs, _response("{}")], sleeps, llm_overload_min_delay_s=45)
     r = c.generate_json(system="s", user="u", response_model=UnitDoc)
-    assert r.attempts == 4
-    assert len(sleeps) == 3 and all(s >= 45 for s in sleeps)
+    assert r.attempts == 3
+    assert len(sleeps) == 2 and all(s >= 45 for s in sleeps)
+
+
+def test_503_has_its_own_smaller_retry_limit():
+    errs = [_api_error(503, "UNAVAILABLE") for _ in range(6)]
+    c = _client(errs, [], llm_max_retries=5, llm_overload_max_retries=1)
+    with pytest.raises(OverloadedError):
+        c.generate_json(system="s", user="u", response_model=UnitDoc)
+    assert len(_stub(c).calls) == 2  # each rejected request still costs free-tier quota
 
 
 def test_daily_quota_is_not_retried():
@@ -120,7 +128,7 @@ def test_daily_quota_is_not_retried():
         "violations": [{"quotaId": "GenerateRequestsPerDayPerProjectPerModel-FreeTier"}],
     }
     c = _client([_api_error(429, "RESOURCE_EXHAUSTED", [quota])], [])
-    with pytest.raises(LLMError, match="daily quota") as exc:
+    with pytest.raises(QuotaExhaustedError, match="daily quota") as exc:
         c.generate_json(system="s", user="u", response_model=UnitDoc)
     assert not isinstance(exc.value, RateLimitError)
     assert len(_stub(c).calls) == 1

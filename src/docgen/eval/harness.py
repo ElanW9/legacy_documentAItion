@@ -70,6 +70,7 @@ def generate_for_eval(
             error=str(exc),
             source_hash=facts.source_hash,
             calls=_calls(exc.calls),
+            provider_unavailable=exc.provider_unavailable,
         )
     return PackageEval(
         name=facts.name,
@@ -128,6 +129,25 @@ def _score_traps(
     return traps
 
 
+# A resumed run must generate its remaining packages exactly like the first part.
+_RESUME_MUST_MATCH = (
+    "chunk_threshold_lines",
+    "llm_temperature",
+    "gemini_thinking_level",
+    "schema_in_prompt",
+)
+
+
+def _run_settings(settings: Settings, prompts: Prompts, cache: ResponseCache) -> dict:
+    return {
+        "chunk_threshold_lines": settings.chunk_threshold_lines,
+        "llm_temperature": settings.llm_temperature,
+        "gemini_thinking_level": settings.gemini_thinking_level,
+        "schema_in_prompt": prompts.schema_in_prompt,
+        "cache_used": cache.directory is not None,
+    }
+
+
 def run_eval(
     gt: GroundTruth,
     *,
@@ -147,6 +167,7 @@ def run_eval(
     missing packages are generated, e.g. after the daily quota ran out."""
     now = now or datetime.now(UTC)
     extracted = _extract_all(root, settings)
+    run_settings = _run_settings(settings, prompts, cache)
     reusable: dict[str, PackageEval] = {}
     if resume is not None:
         if (resume.model, resume.prompt_fingerprint) != (client.model, prompts.fingerprint[:16]):
@@ -155,6 +176,14 @@ def run_eval(
                 f"{resume.prompt_version} ({resume.prompt_fingerprint}); now {client.model} and "
                 f"{prompts.version} ({prompts.fingerprint[:16]})"
             )
+        changed = {
+            k: (resume.settings.get(k), v)
+            for k, v in run_settings.items()
+            if k in _RESUME_MUST_MATCH and resume.settings.get(k) != v
+        }
+        if changed:
+            diff = ", ".join(f"{k}: {old!r} -> {new!r}" for k, (old, new) in changed.items())
+            raise ValueError(f"cannot resume {resume.run_id}: generation settings differ ({diff})")
         for pkg in resume.packages:
             ext = extracted.get(pkg.name)
             if pkg.ok and ext is not None and pkg.source_hash == ext.facts.source_hash:
@@ -166,16 +195,29 @@ def run_eval(
         raise ValueError(f"unknown package(s): {', '.join(unknown)}")
 
     results: dict[str, PackageEval] = {}
+    unavailable: str | None = None
     for name in wanted:
         if name in reusable:
             log.info("%s: reusing result from %s", name, resume.run_id if resume else "")
             results[name] = score_package(extracted[name], reusable[name])
+            continue
+        if unavailable is not None:
+            # Same rule as the pipeline: stop spending quota once the model is unavailable.
+            log.warning("%s: not attempted (%s)", name, unavailable)
+            results[name] = PackageEval(
+                name=name,
+                ok=False,
+                error=f"not attempted: {unavailable}",
+                source_hash=extracted[name].facts.source_hash,
+            )
             continue
         log.info("evaluating %s", name)
         generated = generate_for_eval(
             extracted[name], client=client, prompts=prompts, settings=settings, cache=cache
         )
         results[name] = score_package(extracted[name], generated)
+        if generated.provider_unavailable:
+            unavailable = f"model unavailable after {name} failed"
 
     traps = _score_traps(gt, results, extracted)
     pkgs = list(results.values())
@@ -195,13 +237,7 @@ def run_eval(
         model=client.model,
         prompt_version=prompts.version,
         prompt_fingerprint=prompts.fingerprint[:16],
-        settings={
-            "chunk_threshold_lines": settings.chunk_threshold_lines,
-            "llm_temperature": settings.llm_temperature,
-            "gemini_thinking_level": settings.gemini_thinking_level,
-            "schema_in_prompt": prompts.schema_in_prompt,
-            "cache_used": cache.directory is not None,
-        },
+        settings=run_settings,
         ground_truth_version=gt.version,
         summary=summarise(pkgs, traps),
         traps=traps,
