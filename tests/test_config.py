@@ -8,6 +8,8 @@ from docgen.config import Settings, SettingsError
 ENV_VARS = [
     "GEMINI_API_KEY",
     "GEMINI_MODEL",
+    "OPENROUTER_API_KEY",
+    "OPENROUTER_MODEL",
     "LLM_PROVIDER",
     "ATLASSIAN_EMAIL",
     "ATLASSIAN_TOKEN",
