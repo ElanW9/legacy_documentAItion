@@ -1,7 +1,14 @@
 """LLM clients behind a provider-neutral interface."""
 
 from docgen.config import Settings
-from docgen.llm.base import LLMClient, LLMError, LLMResponse, RateLimitError, TransientLLMError
+from docgen.llm.base import (
+    LLMClient,
+    LLMError,
+    LLMResponse,
+    OverloadedError,
+    RateLimitError,
+    TransientLLMError,
+)
 from docgen.llm.fake import FakeLLMClient
 
 
@@ -20,6 +27,7 @@ __all__ = [
     "LLMClient",
     "LLMError",
     "LLMResponse",
+    "OverloadedError",
     "RateLimitError",
     "TransientLLMError",
     "make_llm_client",

@@ -96,11 +96,22 @@ def test_429_is_retried_honouring_retry_info():
 
 
 def test_5xx_is_retried_then_gives_up():
-    errs = [_api_error(503, "UNAVAILABLE") for _ in range(3)]
-    c = _client(errs, [], llm_max_retries=2)
-    with pytest.raises(LLMError, match="503"):
+    errs = [_api_error(500, "INTERNAL") for _ in range(3)]
+    sleeps: list[float] = []
+    c = _client(errs, sleeps, llm_max_retries=2)
+    with pytest.raises(LLMError, match="500"):
         c.generate_json(system="s", user="u", response_model=UnitDoc)
     assert len(_stub(c).calls) == 3
+    assert all(s < 30 for s in sleeps)  # ordinary backoff, no overload floor
+
+
+def test_503_overloaded_waits_at_least_the_overload_delay():
+    errs = [_api_error(503, "UNAVAILABLE") for _ in range(3)]
+    sleeps: list[float] = []
+    c = _client([*errs, _response("{}")], sleeps, llm_overload_min_delay_s=45)
+    r = c.generate_json(system="s", user="u", response_model=UnitDoc)
+    assert r.attempts == 4
+    assert len(sleeps) == 3 and all(s >= 45 for s in sleeps)
 
 
 def test_daily_quota_is_not_retried():

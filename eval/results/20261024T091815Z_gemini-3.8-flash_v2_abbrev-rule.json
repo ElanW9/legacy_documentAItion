@@ -1,9 +1,11 @@
 {
  "run_id": "20261024T091815Z_gemini-3.8-flash_v2_abbrev-rule",
  "created_at": "2026-10-24T09:18:15.601959Z",
- "resumed_at": [],
+ "resumed_at": [
+  "2026-10-25T16:07:50.730719Z"
+ ],
  "label": "abbrev-rule",
- "commit": "6244a1c953ecf9dfc45d81e25ef8ff8e41c016da+dirty",
+ "commit": "6244a1c953ecf9dfc45d81e25ef8ff8e41c016da+dirty, 46001b428bab14b9d5ec7be182937d484022018f",
  "model": "gemini-3.8-flash",
  "prompt_version": "v2",
  "prompt_fingerprint": "7f8df36e1994aba3",
@@ -29,33 +31,14 @@
   "trap_evidence_hits": 0,
   "trap_evidence_total": 0,
   "hallucinations": 0,
-  "llm_calls": 5,
+  "llm_calls": 2,
   "validation_retries": 0,
-  "tokens_in": 20103,
-  "tokens_out": 11912,
-  "latency_s": 588.5
+  "tokens_in": 10225,
+  "tokens_out": 4600,
+  "latency_s": 242.1
  },
- "original_summary": {
-  "packages": 4,
-  "failed": 2,
-  "coverage_pct": 100.0,
-  "notes_coverage_pct": 100.0,
-  "tables_coverage_pct": 100.0,
-  "faithfulness_violations": 0,
-  "rules": 16,
-  "evidence_valid_pct": 100.0,
-  "traps_found": 3,
-  "traps_total": 9,
-  "trap_evidence_hits": 0,
-  "trap_evidence_total": 0,
-  "hallucinations": 0,
-  "llm_calls": 5,
-  "validation_retries": 0,
-  "tokens_in": 20103,
-  "tokens_out": 11912,
-  "latency_s": 588.5
- },
- "rescored_at": "2026-10-24T09:29:24.310804Z",
+ "original_summary": null,
+ "rescored_at": null,
  "traps": [
   {
    "id": "T1-hidden-case-rule",
@@ -795,7 +778,7 @@
   {
    "name": "ORD_PROC",
    "ok": false,
-   "error": "ORD_PROC.CANCEL_ORDER: Gemini API error 429 RESOURCE_EXHAUSTED: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate-limits.\nPlease retry in 21h31m55.882224379s. (daily quota exhausted; not retrying)",
+   "error": "ORD_PROC.CALC_DISC_PCT: Gemini API error 503 UNAVAILABLE: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
    "mode": null,
    "source_hash": "1cc353c91a648bba47c83e0e37cba866a517fdb1a13ddfdf4a13c9dce042a2cd",
    "metrics": {
@@ -810,38 +793,7 @@
     "open_questions": 0
    },
    "findings": [],
-   "calls": [
-    {
-     "unit": "ORD_PROC.CALC_DISC_PCT",
-     "purpose": "unit",
-     "input_tokens": 3247,
-     "output_tokens": 2369,
-     "latency_s": 132.3,
-     "attempts": 2,
-     "validation_retries": 0,
-     "cached": false
-    },
-    {
-     "unit": "ORD_PROC.VALIDATE_ORDER",
-     "purpose": "unit",
-     "input_tokens": 3433,
-     "output_tokens": 2311,
-     "latency_s": 122.58,
-     "attempts": 1,
-     "validation_retries": 0,
-     "cached": false
-    },
-    {
-     "unit": "ORD_PROC.SUBMIT_ORDER",
-     "purpose": "unit",
-     "input_tokens": 3198,
-     "output_tokens": 2632,
-     "latency_s": 91.49,
-     "attempts": 1,
-     "validation_retries": 0,
-     "cached": false
-    }
-   ],
+   "calls": [],
    "raw_doc": null,
    "doc": null,
    "unit_docs": {}
@@ -849,7 +801,7 @@
   {
    "name": "UTIL_LOG",
    "ok": false,
-   "error": "UTIL_LOG: Gemini API error 429 RESOURCE_EXHAUSTED: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate-limits.\nPlease retry in 21h31m55.720328754s. (daily quota exhausted; not retrying)",
+   "error": "UTIL_LOG: Gemini API error 503 UNAVAILABLE: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
    "mode": null,
    "source_hash": "792de712f1960f9e20f2de864e29bde1ac45b5439ea27a3c99d854aa8c318819",
    "metrics": {

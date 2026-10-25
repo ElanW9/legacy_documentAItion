@@ -17,11 +17,20 @@ class RetryPolicy:
     base_s: float = 2.0
     cap_s: float = 60.0
 
-    def delay(self, attempt: int, retry_after_s: float | None, rng: Callable[[], float]) -> float:
-        """Full jitter: uniform(0, min(cap, base * 2**attempt)), never below Retry-After."""
+    def delay(
+        self,
+        attempt: int,
+        retry_after_s: float | None,
+        rng: Callable[[], float],
+        min_delay_s: float | None = None,
+    ) -> float:
+        """Full jitter: uniform(0, min(cap, base * 2**attempt)), never below
+        Retry-After (capped) or the caller's minimum delay."""
         backoff = min(self.cap_s, self.base_s * (2**attempt)) * rng()
         if retry_after_s is not None:
-            return max(min(retry_after_s, self.cap_s), backoff)
+            backoff = max(min(retry_after_s, self.cap_s), backoff)
+        if min_delay_s is not None:
+            backoff = max(min_delay_s, backoff)
         return backoff
 
 
@@ -29,6 +38,8 @@ class RetryPolicy:
 class RetryDecision:
     retry: bool
     retry_after_s: float | None = None
+    # Floor for the delay, e.g. for an overloaded service where seconds won't help.
+    min_delay_s: float | None = None
 
 
 def call_with_retry[T](
@@ -49,7 +60,7 @@ def call_with_retry[T](
             decision = classify(exc)
             if not decision.retry or attempt >= policy.max_retries:
                 raise
-            delay = policy.delay(attempt, decision.retry_after_s, rng)
+            delay = policy.delay(attempt, decision.retry_after_s, rng, decision.min_delay_s)
             # Messages of our exception types carry status codes, never credentials.
             log.warning(
                 "%s failed (%s: %.200s); retry %d/%d in %.1fs",

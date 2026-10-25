@@ -31,6 +31,10 @@ class TransientLLMError(LLMError):
     """5xx / timeout. Retryable."""
 
 
+class OverloadedError(TransientLLMError):
+    """HTTP 503: the model is overloaded. Retryable, but only after a longer wait."""
+
+
 @dataclass(frozen=True)
 class LLMResponse:
     text: str
