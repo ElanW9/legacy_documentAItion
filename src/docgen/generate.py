@@ -22,7 +22,7 @@ from typing import Literal
 from pydantic import ValidationError
 
 from docgen.extract import ExtractedPackage
-from docgen.llm.base import LLMClient, LLMError
+from docgen.llm.base import LLMClient, LLMError, provider_unavailable
 from docgen.models import PackageFacts, Subprogram, UnitDoc
 from docgen.prompts import Prompts, number_lines, synthesis_message, unit_message
 
@@ -32,11 +32,18 @@ Mode = Literal["whole", "chunked", "no_body"]
 
 
 class GenerationError(RuntimeError):
-    """A unit could not be documented. Carries the calls made so far for reporting."""
+    """A unit could not be documented. Carries the calls made so far for reporting.
 
-    def __init__(self, message: str, calls: list[LLMCallRecord]) -> None:
+    `provider_unavailable`: the model is overloaded or out of quota, so the
+    caller should stop calling it for the rest of the run.
+    """
+
+    def __init__(
+        self, message: str, calls: list[LLMCallRecord], *, provider_unavailable: bool = False
+    ) -> None:
         super().__init__(message)
         self.calls = calls
+        self.provider_unavailable = provider_unavailable
 
 
 @dataclass(frozen=True)
@@ -221,6 +228,7 @@ def generate_package_doc(
     if lines and lines[-1] == "":
         lines = lines[:-1]
     calls: list[LLMCallRecord] = []
+    schema_model = UnitDoc if prompts.schema_in_prompt else None
 
     def run(unit: str, purpose: Literal["unit", "synthesis"], system: str, user: str) -> UnitDoc:
         try:
@@ -228,9 +236,13 @@ def generate_package_doc(
                 client, system=system, user=user, unit=unit, purpose=purpose, cache=cache
             )
         except GenerationError as exc:
-            raise GenerationError(str(exc), calls + exc.calls) from None
+            raise GenerationError(
+                str(exc), calls + exc.calls, provider_unavailable=exc.provider_unavailable
+            ) from None
         except LLMError as exc:
-            raise GenerationError(f"{unit}: {exc}", calls) from None
+            raise GenerationError(
+                f"{unit}: {exc}", calls, provider_unavailable=provider_unavailable(exc)
+            ) from None
         calls.append(rec)
         return doc
 
@@ -241,7 +253,7 @@ def generate_package_doc(
             kind="package",
             facts=_facts_for_llm(facts),
             source=number_lines(lines, 1, len(lines)),
-            model=UnitDoc,
+            model=schema_model,
         )
         return GenerationResult(run(facts.name, "unit", prompts.system, user), "whole", calls)
 
@@ -253,7 +265,7 @@ def generate_package_doc(
             kind=f"{sub.kind.lower()} of package {facts.name}",
             facts=_facts_for_subprogram(facts, sub),
             source=_chunk_source(lines, facts, sub),
-            model=UnitDoc,
+            model=schema_model,
         )
         unit_docs[sub.name] = run(unit, "unit", prompts.system, user)
 
@@ -263,7 +275,7 @@ def generate_package_doc(
         unit_docs=[
             {"subprogram": name, **d.model_dump(mode="json")} for name, d in unit_docs.items()
         ],
-        model=UnitDoc,
+        model=schema_model,
     )
     doc = run(facts.name, "synthesis", prompts.synthesis, user)
     return GenerationResult(doc, "chunked", calls, unit_docs)

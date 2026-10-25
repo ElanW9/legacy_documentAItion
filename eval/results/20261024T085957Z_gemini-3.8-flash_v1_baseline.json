@@ -1,0 +1,1923 @@
+{
+ "run_id": "20261024T085957Z_gemini-3.8-flash_v1_baseline",
+ "created_at": "2026-10-24T08:59:57.151765Z",
+ "resumed_at": [],
+ "label": "baseline",
+ "commit": "6244a1c953ecf9dfc45d81e25ef8ff8e41c016da+dirty",
+ "model": "gemini-3.8-flash",
+ "prompt_version": "v1",
+ "prompt_fingerprint": "dd5a55a58b6fa91e",
+ "settings": {
+  "chunk_threshold_lines": 150,
+  "llm_temperature": null,
+  "gemini_thinking_level": null,
+  "schema_in_prompt": true,
+  "cache_used": false
+ },
+ "ground_truth_version": 2,
+ "summary": {
+  "packages": 4,
+  "failed": 0,
+  "coverage_pct": 100.0,
+  "notes_coverage_pct": 100.0,
+  "tables_coverage_pct": 100.0,
+  "faithfulness_violations": 0,
+  "rules": 35,
+  "evidence_valid_pct": 100.0,
+  "traps_found": 8,
+  "traps_total": 9,
+  "trap_evidence_hits": 1,
+  "trap_evidence_total": 1,
+  "hallucinations": 0,
+  "llm_calls": 9,
+  "validation_retries": 0,
+  "tokens_in": 38266,
+  "tokens_out": 26827,
+  "latency_s": 876.5
+ },
+ "original_summary": {
+  "packages": 4,
+  "failed": 0,
+  "coverage_pct": 100.0,
+  "notes_coverage_pct": 100.0,
+  "tables_coverage_pct": 100.0,
+  "faithfulness_violations": 7,
+  "rules": 35,
+  "evidence_valid_pct": 100.0,
+  "traps_found": 8,
+  "traps_total": 9,
+  "trap_evidence_hits": 1,
+  "trap_evidence_total": 1,
+  "hallucinations": 0,
+  "llm_calls": 9,
+  "validation_retries": 0,
+  "tokens_in": 38266,
+  "tokens_out": 26827,
+  "latency_s": 876.5
+ },
+ "rescored_at": "2026-10-24T09:29:24.278062Z",
+ "traps": [
+  {
+   "id": "T1-hidden-case-rule",
+   "type": "hidden_business_rule",
+   "package": "ORD_PROC",
+   "procedure": "CALC_DISC_PCT",
+   "found": true,
+   "found_in": "business_rules",
+   "matched_text": "Customer level 'S' using sales channel 'W' during December (month '12') receives a discount of 5%.",
+   "evidence_hit": true,
+   "hallucinated": false,
+   "found_in_unit_doc": true,
+   "package_failed": false
+  },
+  {
+   "id": "T2a-dead-procedure",
+   "type": "dead_code",
+   "package": "CUST_MGMT",
+   "procedure": "REBUILD_CST_IDX",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "REBUILD_CST_IDX is a private procedure and is never invoked anywhere inside CUST_MGMT; is it dead code or should it be made public in the package specification?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T2b-unreachable-branch",
+   "type": "dead_code",
+   "package": "ORD_PROC",
+   "procedure": "CANCEL_ORDER",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "Constant C_ALLOW_PARTIAL is defined as FALSE on line 4, making the ELSIF branch on lines 116-120 of CANCEL_ORDER dead code that can never execute; should partial cancellation be enabled or removed?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": true,
+   "package_failed": false
+  },
+  {
+   "id": "T3-cross-package-call",
+   "type": "cross_package_call",
+   "package": "ORD_PROC",
+   "procedure": "SUBMIT_ORDER",
+   "found": true,
+   "found_in": "main_flow",
+   "matched_text": "SUBMIT_ORDER orchestrates the submission by validating the order, updating line items with the calculated discount, marking the header status as 'S', invoking BILL_CALC.CREATE_INVOICE to set status 'I', and writing an informational log.",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": true,
+   "package_failed": false
+  },
+  {
+   "id": "T4-magic-number",
+   "type": "magic_number",
+   "package": "BILL_CALC",
+   "procedure": "CALC_LATE_FEE",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "In calc_late_fee, what is the business justification for the magic number threshold of 47 days before applying late fees?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T5a-swallowed-exception-invoice",
+   "type": "swallowed_exception",
+   "package": "ORD_PROC",
+   "procedure": "SUBMIT_ORDER",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "In lines 91-94 of SUBMIT_ORDER, the exception block catches WHEN OTHERS and performs NULL without logging or raising. Should invoice creation failures be silently swallowed leaving the order in status 'S', or should failures be logged or rolled back?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": true,
+   "package_failed": false
+  },
+  {
+   "id": "T5b-swallowed-exception-logging",
+   "type": "swallowed_exception",
+   "package": "UTIL_LOG",
+   "procedure": "LOG_MSG",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "LOG_MSG uses a WHEN OTHERS THEN NULL handler that silently swallows all errors (such as sequence exhaustion or table unavailability). Is this intended to ensure calling transactions never fail, or should failures be surfaced or alerted elsewhere?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T6-cryptic-naming",
+   "type": "cryptic_naming",
+   "package": "CUST_MGMT",
+   "procedure": "CHK_CST_XFL",
+   "found": false,
+   "found_in": null,
+   "matched_text": null,
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T7-commented-out-block",
+   "type": "commented_out_logic",
+   "package": "BILL_CALC",
+   "procedure": "CREATE_INVOICE",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "In create_invoice, cust_mgmt.get_cst_lvl(v_cst_id) is invoked and stored in v_lvl, but lines 65-70 contain commented-out logic ('KMO discount, disabled 2009'), leaving v_lvl unused. Should the function call and variable be removed, or is this discount planned to be reintroduced?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  }
+ ],
+ "packages": [
+  {
+   "name": "BILL_CALC",
+   "ok": true,
+   "error": null,
+   "mode": "whole",
+   "source_hash": null,
+   "metrics": {
+    "subprograms": 3,
+    "subprograms_with_note": 3,
+    "tables": 4,
+    "tables_on_page": 4,
+    "rules": 5,
+    "rules_valid_evidence": 5,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 3
+   },
+   "findings": [],
+   "calls": [
+    {
+     "unit": "BILL_CALC",
+     "purpose": "unit",
+     "input_tokens": 4981,
+     "output_tokens": 3424,
+     "latency_s": 127.49,
+     "attempts": 5,
+     "validation_retries": 0,
+     "cached": false
+    }
+   ],
+   "raw_doc": {
+    "source_complete": true,
+    "purpose": "Calculates invoice line amounts, late fees, and creates customer invoices with tax calculations and customer balance updates.",
+    "procedure_notes": [
+     {
+      "name": "calc_line_amt",
+      "summary": "Calculates the net amount for an order line from quantity, unit price, and optional discount percentage, rounded to two decimal places."
+     },
+     {
+      "name": "calc_late_fee",
+      "summary": "Calculates late fees on an overdue invoice based on the number of days past due and open amount, returning 0 if not overdue or not found."
+     },
+     {
+      "name": "create_invoice",
+      "summary": "Creates a new invoice from order lines, calculates standard VAT, updates the customer balance, and logs the creation."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Line amounts are calculated as quantity multiplied by unit price and net of discount percentage (p_qty * p_price * (1 - NVL(p_disc, 0) / 100)), rounded to 2 decimal places per line as required by accounting package import.",
+      "implemented_in": "calc_line_amt",
+      "evidence_lines": [
+       12,
+       13
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Late fees apply only when an invoice is overdue by more than 47 days; the fee is calculated as open amount multiplied by 0.015 for each 30-day period (CEIL(v_days / 30)), rounded to 2 decimal places, subject to a minimum fee of 7.5.",
+      "implemented_in": "calc_late_fee",
+      "evidence_lines": [
+       32,
+       36
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoices have an invoice date set to TRUNC(SYSDATE) and a payment due date set to 30 days after the invoice date.",
+      "implemented_in": "create_invoice",
+      "evidence_lines": [
+       74,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Standard VAT rate is 21% (c_vat_std = 0.21); vat_amt is calculated as ROUND(v_net * 0.21, 2) and total open amount is calculated as ROUND(v_net * (1 + 0.21), 2).",
+      "implemented_in": "create_invoice",
+      "evidence_lines": [
+       74,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer open balance in cst_bal is increased by the gross invoice amount (or inserted if no balance record exists).",
+      "implemented_in": "create_invoice",
+      "evidence_lines": [
+       78,
+       84
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Fetch customer ID associated with the order from ord_hdr.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 2,
+      "description": "Loop through all line items for the order in ord_line and accumulate net amounts using calc_line_amt.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 3,
+      "description": "Query customer level using cust_mgmt.get_cst_lvl.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 4,
+      "description": "Generate a new invoice ID using sequence inv_seq.NEXTVAL.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 5,
+      "description": "Insert invoice header into inv_hdr with calculated net, VAT, and gross amounts.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 6,
+      "description": "Merge total invoice gross amount into customer balance table cst_bal.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 7,
+      "description": "Log the invoice creation details using util_log.log_msg.",
+      "implemented_in": "create_invoice"
+     }
+    ],
+    "edge_cases": [
+     "If calc_late_fee is called for an invoice ID that does not exist in inv_hdr, the NO_DATA_FOUND exception is caught and returns 0.",
+     "If p_disc is NULL in calc_line_amt, NVL defaults the discount to 0.",
+     "If an order has no lines in ord_line, v_net remains 0, creating an invoice and balance adjustment of 0."
+    ],
+    "open_questions": [
+     "In create_invoice, cust_mgmt.get_cst_lvl(v_cst_id) is invoked and stored in v_lvl, but lines 65-70 contain commented-out logic ('KMO discount, disabled 2009'), leaving v_lvl unused. Should the function call and variable be removed, or is this discount planned to be reintroduced?",
+     "In calc_late_fee, what is the business justification for the magic number threshold of 47 days before applying late fees?",
+     "In calc_late_fee, ELSIF v_days > 0 sets v_fee := 0, which is identical to the initialized default of 0. Was there intended logic for invoices overdue between 1 and 47 days?"
+    ]
+   },
+   "doc": {
+    "source_complete": true,
+    "purpose": "Calculates invoice line amounts, late fees, and creates customer invoices with tax calculations and customer balance updates.",
+    "procedure_notes": [
+     {
+      "name": "calc_line_amt",
+      "summary": "Calculates the net amount for an order line from quantity, unit price, and optional discount percentage, rounded to two decimal places."
+     },
+     {
+      "name": "calc_late_fee",
+      "summary": "Calculates late fees on an overdue invoice based on the number of days past due and open amount, returning 0 if not overdue or not found."
+     },
+     {
+      "name": "create_invoice",
+      "summary": "Creates a new invoice from order lines, calculates standard VAT, updates the customer balance, and logs the creation."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Line amounts are calculated as quantity multiplied by unit price and net of discount percentage (p_qty * p_price * (1 - NVL(p_disc, 0) / 100)), rounded to 2 decimal places per line as required by accounting package import.",
+      "implemented_in": "calc_line_amt",
+      "evidence_lines": [
+       12,
+       13
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Late fees apply only when an invoice is overdue by more than 47 days; the fee is calculated as open amount multiplied by 0.015 for each 30-day period (CEIL(v_days / 30)), rounded to 2 decimal places, subject to a minimum fee of 7.5.",
+      "implemented_in": "calc_late_fee",
+      "evidence_lines": [
+       32,
+       36
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoices have an invoice date set to TRUNC(SYSDATE) and a payment due date set to 30 days after the invoice date.",
+      "implemented_in": "create_invoice",
+      "evidence_lines": [
+       74,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Standard VAT rate is 21% (c_vat_std = 0.21); vat_amt is calculated as ROUND(v_net * 0.21, 2) and total open amount is calculated as ROUND(v_net * (1 + 0.21), 2).",
+      "implemented_in": "create_invoice",
+      "evidence_lines": [
+       74,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer open balance in cst_bal is increased by the gross invoice amount (or inserted if no balance record exists).",
+      "implemented_in": "create_invoice",
+      "evidence_lines": [
+       78,
+       84
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Fetch customer ID associated with the order from ord_hdr.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 2,
+      "description": "Loop through all line items for the order in ord_line and accumulate net amounts using calc_line_amt.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 3,
+      "description": "Query customer level using cust_mgmt.get_cst_lvl.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 4,
+      "description": "Generate a new invoice ID using sequence inv_seq.NEXTVAL.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 5,
+      "description": "Insert invoice header into inv_hdr with calculated net, VAT, and gross amounts.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 6,
+      "description": "Merge total invoice gross amount into customer balance table cst_bal.",
+      "implemented_in": "create_invoice"
+     },
+     {
+      "step": 7,
+      "description": "Log the invoice creation details using util_log.log_msg.",
+      "implemented_in": "create_invoice"
+     }
+    ],
+    "edge_cases": [
+     "If calc_late_fee is called for an invoice ID that does not exist in inv_hdr, the NO_DATA_FOUND exception is caught and returns 0.",
+     "If p_disc is NULL in calc_line_amt, NVL defaults the discount to 0.",
+     "If an order has no lines in ord_line, v_net remains 0, creating an invoice and balance adjustment of 0."
+    ],
+    "open_questions": [
+     "In create_invoice, cust_mgmt.get_cst_lvl(v_cst_id) is invoked and stored in v_lvl, but lines 65-70 contain commented-out logic ('KMO discount, disabled 2009'), leaving v_lvl unused. Should the function call and variable be removed, or is this discount planned to be reintroduced?",
+     "In calc_late_fee, what is the business justification for the magic number threshold of 47 days before applying late fees?",
+     "In calc_late_fee, ELSIF v_days > 0 sets v_fee := 0, which is identical to the initialized default of 0. Was there intended logic for invoices overdue between 1 and 47 days?"
+    ]
+   },
+   "unit_docs": {}
+  },
+  {
+   "name": "CUST_MGMT",
+   "ok": true,
+   "error": null,
+   "mode": "whole",
+   "source_hash": null,
+   "metrics": {
+    "subprograms": 4,
+    "subprograms_with_note": 4,
+    "tables": 4,
+    "tables_on_page": 4,
+    "rules": 5,
+    "rules_valid_evidence": 5,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 3
+   },
+   "findings": [],
+   "calls": [
+    {
+     "unit": "CUST_MGMT",
+     "purpose": "unit",
+     "input_tokens": 5030,
+     "output_tokens": 3194,
+     "latency_s": 78.82,
+     "attempts": 2,
+     "validation_retries": 0,
+     "cached": false
+    }
+   ],
+   "raw_doc": {
+    "source_complete": true,
+    "purpose": "Provides customer management operations, including customer tier calculation, customer status updates with audit logging, cross-border tax indicator determination, and customer search index rebuilding.",
+    "procedure_notes": [
+     {
+      "name": "GET_CST_LVL",
+      "summary": "Calculates and returns a customer tier code ('G', 'S', or 'B') based on invoice total over the past 12 months and customer tenure in years."
+     },
+     {
+      "name": "UPD_CST_STAT",
+      "summary": "Locks the customer record, verifies the customer is not closed ('X'), updates the status code, logs the previous and new status in CST_STAT_HIST, and logs a message."
+     },
+     {
+      "name": "CHK_CST_XFL",
+      "summary": "Determines a customer cross-border flag ('Y', 'P', or 'N') based on type code, country code, and presence of a VAT number."
+     },
+     {
+      "name": "REBUILD_CST_IDX",
+      "summary": "Clears and repopulates the CST_IDX table with composite search keys for all customers whose status is not 'X', followed by a COMMIT."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "A customer is assigned tier 'G' if the 12-month invoice total is at least 25000, or at least 10000 with at least 5 years of tenure; tier 'S' if total is at least 5000; otherwise tier 'B'.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       17,
+       22
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customers with status code 'X' are closed and cannot have their status updated; attempting to update raises application error -20031.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       41,
+       43
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Every successful customer status update must record the previous status, new status, update date, and user in CST_STAT_HIST.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       51,
+       52
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Cross-border flag is 'Y' if type code is 'K', country code is not 'BE', and VAT number is present; 'P' if type code is 'K', country code is not 'BE', and VAT number is missing; otherwise 'N'.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       70,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The search index excludes closed customers (status code 'X') and constructs search keys as UPPER(TRIM(nm)) || '#' || zip_cd.",
+      "implemented_in": "REBUILD_CST_IDX",
+      "evidence_lines": [
+       82,
+       85
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Lock the customer record in CST_MSTR for update and check existing status code.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 2,
+      "description": "If existing status code is 'X', raise application error -20031.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 3,
+      "description": "Update CST_MSTR with the new status code, current date, and user.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 4,
+      "description": "Insert audit entry into CST_STAT_HIST with the status change details.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 5,
+      "description": "Log informational change message using UTIL_LOG.LOG_MSG.",
+      "implemented_in": "UPD_CST_STAT"
+     }
+    ],
+    "edge_cases": [
+     "In GET_CST_LVL, if a customer has no records found or no qualifying history records, NO_DATA_FOUND is caught and 'B' is returned.",
+     "In UPD_CST_STAT, updating a customer already having status 'X' raises error -20031.",
+     "In CHK_CST_XFL, a customer with type 'K' and non-'BE' country but NULL vat_no receives flag 'P' instead of 'Y'."
+    ],
+    "open_questions": [
+     "REBUILD_CST_IDX is a private procedure and is never invoked anywhere inside CUST_MGMT; is it dead code or should it be made public in the package specification?",
+     "REBUILD_CST_IDX performs an explicit COMMIT on line 86; is this intentional for index maintenance, or does it unexpectedly terminate calling transaction contexts?",
+     "In GET_CST_LVL, the query inner-joins CST_MSTR to CST_HIST on invoices from the last 12 months. If a customer has no invoices in the last 12 months, does raising NO_DATA_FOUND and defaulting to 'B' bypass legitimate tenure evaluation for older customers?"
+    ]
+   },
+   "doc": {
+    "source_complete": true,
+    "purpose": "Provides customer management operations, including customer tier calculation, customer status updates with audit logging, cross-border tax indicator determination, and customer search index rebuilding.",
+    "procedure_notes": [
+     {
+      "name": "GET_CST_LVL",
+      "summary": "Calculates and returns a customer tier code ('G', 'S', or 'B') based on invoice total over the past 12 months and customer tenure in years."
+     },
+     {
+      "name": "UPD_CST_STAT",
+      "summary": "Locks the customer record, verifies the customer is not closed ('X'), updates the status code, logs the previous and new status in CST_STAT_HIST, and logs a message."
+     },
+     {
+      "name": "CHK_CST_XFL",
+      "summary": "Determines a customer cross-border flag ('Y', 'P', or 'N') based on type code, country code, and presence of a VAT number."
+     },
+     {
+      "name": "REBUILD_CST_IDX",
+      "summary": "Clears and repopulates the CST_IDX table with composite search keys for all customers whose status is not 'X', followed by a COMMIT."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "A customer is assigned tier 'G' if the 12-month invoice total is at least 25000, or at least 10000 with at least 5 years of tenure; tier 'S' if total is at least 5000; otherwise tier 'B'.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       17,
+       22
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customers with status code 'X' are closed and cannot have their status updated; attempting to update raises application error -20031.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       41,
+       43
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Every successful customer status update must record the previous status, new status, update date, and user in CST_STAT_HIST.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       51,
+       52
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Cross-border flag is 'Y' if type code is 'K', country code is not 'BE', and VAT number is present; 'P' if type code is 'K', country code is not 'BE', and VAT number is missing; otherwise 'N'.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       70,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The search index excludes closed customers (status code 'X') and constructs search keys as UPPER(TRIM(nm)) || '#' || zip_cd.",
+      "implemented_in": "REBUILD_CST_IDX",
+      "evidence_lines": [
+       82,
+       85
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Lock the customer record in CST_MSTR for update and check existing status code.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 2,
+      "description": "If existing status code is 'X', raise application error -20031.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 3,
+      "description": "Update CST_MSTR with the new status code, current date, and user.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 4,
+      "description": "Insert audit entry into CST_STAT_HIST with the status change details.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 5,
+      "description": "Log informational change message using UTIL_LOG.LOG_MSG.",
+      "implemented_in": "UPD_CST_STAT"
+     }
+    ],
+    "edge_cases": [
+     "In GET_CST_LVL, if a customer has no records found or no qualifying history records, NO_DATA_FOUND is caught and 'B' is returned.",
+     "In UPD_CST_STAT, updating a customer already having status 'X' raises error -20031.",
+     "In CHK_CST_XFL, a customer with type 'K' and non-'BE' country but NULL vat_no receives flag 'P' instead of 'Y'."
+    ],
+    "open_questions": [
+     "REBUILD_CST_IDX is a private procedure and is never invoked anywhere inside CUST_MGMT; is it dead code or should it be made public in the package specification?",
+     "REBUILD_CST_IDX performs an explicit COMMIT on line 86; is this intentional for index maintenance, or does it unexpectedly terminate calling transaction contexts?",
+     "In GET_CST_LVL, the query inner-joins CST_MSTR to CST_HIST on invoices from the last 12 months. If a customer has no invoices in the last 12 months, does raising NO_DATA_FOUND and defaulting to 'B' bypass legitimate tenure evaluation for older customers?"
+    ]
+   },
+   "unit_docs": {}
+  },
+  {
+   "name": "ORD_PROC",
+   "ok": true,
+   "error": null,
+   "mode": "chunked",
+   "source_hash": null,
+   "metrics": {
+    "subprograms": 5,
+    "subprograms_with_note": 5,
+    "tables": 2,
+    "tables_on_page": 2,
+    "rules": 23,
+    "rules_valid_evidence": 23,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 12
+   },
+   "findings": [],
+   "calls": [
+    {
+     "unit": "ORD_PROC.CALC_DISC_PCT",
+     "purpose": "unit",
+     "input_tokens": 3140,
+     "output_tokens": 2435,
+     "latency_s": 90.14,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    },
+    {
+     "unit": "ORD_PROC.VALIDATE_ORDER",
+     "purpose": "unit",
+     "input_tokens": 3326,
+     "output_tokens": 2540,
+     "latency_s": 102.16,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    },
+    {
+     "unit": "ORD_PROC.SUBMIT_ORDER",
+     "purpose": "unit",
+     "input_tokens": 3091,
+     "output_tokens": 2071,
+     "latency_s": 68.77,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    },
+    {
+     "unit": "ORD_PROC.CANCEL_ORDER",
+     "purpose": "unit",
+     "input_tokens": 3174,
+     "output_tokens": 2068,
+     "latency_s": 100.84,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    },
+    {
+     "unit": "ORD_PROC.ARCHIVE_ORDERS",
+     "purpose": "unit",
+     "input_tokens": 3146,
+     "output_tokens": 1898,
+     "latency_s": 89.89,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    },
+    {
+     "unit": "ORD_PROC",
+     "purpose": "synthesis",
+     "input_tokens": 9472,
+     "output_tokens": 7529,
+     "latency_s": 82.65,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    }
+   ],
+   "raw_doc": {
+    "source_complete": true,
+    "purpose": "The ORD_PROC package manages the end-to-end lifecycle of orders, encompassing order validation, submission, cancellation, and historical archiving. During order submission, it validates order constraints, calculates tier- and channel-based discounts, updates line items, and coordinates invoice generation. It also facilitates order cancellations under eligible statuses and purges aged orders into yearly archive tables.",
+    "procedure_notes": [
+     {
+      "name": "CALC_DISC_PCT",
+      "summary": "Aggregates total order value from ORD_HDR and ORD_LINE, queries the customer level from CUST_MGMT.GET_CST_LVL, and evaluates a tiered discount percentage."
+     },
+     {
+      "name": "VALIDATE_ORDER",
+      "summary": "Validates that the order has status 'N', contains between 1 and G_MAX_LINES (250) line items, and that the associated customer does not have an 'xfl' value of 'P'."
+     },
+     {
+      "name": "SUBMIT_ORDER",
+      "summary": "Validates the specified order, updates its lines with a calculated discount, sets order header status to 'S', attempts to create an invoice and update the status to 'I', and writes an informational log entry."
+     },
+     {
+      "name": "CANCEL_ORDER",
+      "summary": "Locks and validates an order header by ID, updates its status to 'C' with the given reason code if in status 'N' or 'S', and logs the cancellation; raises error -20111 for ineligible statuses."
+     },
+     {
+      "name": "ARCHIVE_ORDERS",
+      "summary": "Inserts qualified orders into a dynamic year-based archive table, deletes matching order lines and order headers, returns the archived count, and logs the action."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Customer level 'G' with an order total of at least 5000 receives a discount of 12%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       24,
+       24
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer level 'G' with an order total under 5000 receives a discount of 8%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       25,
+       25
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer level 'S' using sales channel 'W' during December (month '12') receives a discount of 5%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       26,
+       27
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer level 'S' that does not qualify for the December channel 'W' promotion receives a discount of 3%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       28,
+       28
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Orders placed through channel 'W' with an order total of at least 2500 receive a discount of 2% if customer level is not 'G' or 'S'.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       29,
+       29
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Orders that do not meet any tier, channel, or seasonal criteria receive a 0% discount.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       30,
+       30
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order must have a status code of 'N'; otherwise, error -20101 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       47,
+       49
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order must have at least one line item (count cannot be 0); otherwise, error -20102 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       56,
+       57
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order cannot have more lines than G_MAX_LINES (250); otherwise, error -20103 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       58,
+       60
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The customer associated with the order cannot have an 'xfl' flag of 'P'; otherwise, error -20104 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       63,
+       65
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Every order line item associated with the order (ORD_ID = P_ORD_ID) is updated with the discount percentage returned by CALC_DISC_PCT.",
+      "implemented_in": "SUBMIT_ORDER",
+      "evidence_lines": [
+       74,
+       78
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When an order is submitted, its header status code (STAT_CD) is initially set to 'S' and its submission date (SUB_DT) is set to SYSDATE.",
+      "implemented_in": "SUBMIT_ORDER",
+      "evidence_lines": [
+       80,
+       83
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "If invoice generation through BILL_CALC.CREATE_INVOICE succeeds, the order header is updated with the invoice identifier (INV_ID) and the status code (STAT_CD) is transitioned to 'I'.",
+      "implemented_in": "SUBMIT_ORDER",
+      "evidence_lines": [
+       86,
+       90
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order with status 'N' or 'S' is cancelled by setting ORD_HDR.STAT_CD to 'C' and ORD_HDR.RSN_CD to the provided P_RSN_CD.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       111,
+       115
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When C_ALLOW_PARTIAL is enabled and status is 'I', order lines in ORD_LINE with SHP_QTY = 0 have their QTY updated to 0.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       116,
+       120
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "If the order is not in an eligible status for cancellation, error -20111 is raised with message 'Order <P_ORD_ID> cannot be cancelled in status <STAT_CD>'.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       121,
+       123
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Every successful cancellation is recorded via UTIL_LOG.LOG_MSG with log level 'I', source 'ORD_PROC', and text containing the order ID and reason code.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       125,
+       125
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The retention period defaults to 730 days if no retention period is provided.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       128,
+       131
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The destination archive table name is constructed dynamically as ORD_HDR_ARCH_ followed by the current four-digit year (YYYY).",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       132,
+       132
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Orders are eligible for archiving only when stat_cd is either 'I' or 'C' and sub_dt is older than SYSDATE minus p_keep_days.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       134,
+       136
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Order line records in ORD_LINE matching eligible order headers (stat_cd in 'I' or 'C' and sub_dt older than SYSDATE minus p_keep_days) must be deleted prior to deleting the headers.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       139,
+       144
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Eligible order headers are permanently deleted from ORD_HDR after their lines have been removed.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       146,
+       148
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "A completion log entry is recorded with level 'I', source 'ORD_PROC', reporting the count of archived orders and the target archive table name.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       150,
+       150
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "VALIDATE_ORDER checks that the order is in status 'N', contains between 1 and 250 line items, and that the customer does not have flag 'P'.",
+      "implemented_in": "VALIDATE_ORDER"
+     },
+     {
+      "step": 2,
+      "description": "CALC_DISC_PCT computes the applicable discount percentage based on order total, customer level from CUST_MGMT.GET_CST_LVL, sales channel, and order date.",
+      "implemented_in": "CALC_DISC_PCT"
+     },
+     {
+      "step": 3,
+      "description": "SUBMIT_ORDER orchestrates the submission by validating the order, updating line items with the calculated discount, marking the header status as 'S', invoking BILL_CALC.CREATE_INVOICE to set status 'I', and writing an informational log.",
+      "implemented_in": "SUBMIT_ORDER"
+     },
+     {
+      "step": 4,
+      "description": "CANCEL_ORDER locks and evaluates the order, transitioning orders in status 'N' or 'S' to status 'C' with a reason code and logging the cancellation.",
+      "implemented_in": "CANCEL_ORDER"
+     },
+     {
+      "step": 5,
+      "description": "ARCHIVE_ORDERS purges aged orders in status 'I' or 'C' older than the retention period by archiving header rows into a dynamic yearly archive table, deleting lines and headers, and logging the archived count.",
+      "implemented_in": "ARCHIVE_ORDERS"
+     }
+    ],
+    "edge_cases": [
+     "If P_ORD_ID has no matching records in ORD_HDR or has no lines in ORD_LINE, the function raises an unhandled NO_DATA_FOUND exception.",
+     "If P_ORD_ID links to multiple headers with differing CST_ID or CHAN_CD, the query will return multiple rows and raise an unhandled TOO_MANY_ROWS exception.",
+     "If the calculated order total is NULL, comparisons against numeric thresholds evaluate to false and fall through to subsequent rules or the default 0%.",
+     "If P_ORD_ID does not exist in ORD_HDR, queries in VALIDATE_ORDER or CANCEL_ORDER raise an unhandled NO_DATA_FOUND exception.",
+     "If ORD_HDR contains duplicate records for P_ORD_ID, the query in VALIDATE_ORDER raises an unhandled TOO_MANY_ROWS exception.",
+     "If BILL_CALC.CREATE_INVOICE or the subsequent update to ORD_HDR fails, the exception is swallowed by a WHEN OTHERS handler, leaving the order header with status code 'S' and no invoice reference.",
+     "If STAT_CD is any value other than 'N' or 'S' (including status 'I', since C_ALLOW_PARTIAL is currently set to FALSE), application error -20111 is raised.",
+     "If p_keep_days is passed as NULL, the date calculation evaluates to NULL, resulting in no orders matching the criteria, 0 rows archived, and 0 rows deleted.",
+     "If no orders meet the archive criteria, p_cnt is set to 0, no records are deleted, and a log entry for 0 orders is created.",
+     "If the yearly archive table does not exist, dynamic SQL execution will fail with an unhandled table or view does not exist exception."
+    ],
+    "open_questions": [
+     "What business meanings do customer levels 'G' and 'S' represent (for example, Gold and Silver), and what channel does 'W' correspond to (for example, Web)?",
+     "Should an unhandled NO_DATA_FOUND exception occur when an order has no line items, or should default values (e.g., total 0, discount 0) be returned instead?",
+     "Package-level constants C_SRC and C_ALLOW_PARTIAL are declared in the package body but not referenced in CALC_DISC_PCT; are they used exclusively by other subprograms?",
+     "What business statuses do the codes 'N', 'S', 'I', and 'C' represent in ORD_HDR.STAT_CD?",
+     "What business meaning is associated with the 'xfl' flag and value 'P' checked via CUST_MGMT.CHK_CST_XFL?",
+     "Should missing order records in ORD_HDR be handled with a custom application error rather than an unhandled NO_DATA_FOUND exception across procedures?",
+     "In lines 91-94 of SUBMIT_ORDER, the exception block catches WHEN OTHERS and performs NULL without logging or raising. Should invoice creation failures be silently swallowed leaving the order in status 'S', or should failures be logged or rolled back?",
+     "Package-level constant C_ALLOW_PARTIAL (line 4) is declared but not referenced in SUBMIT_ORDER; is partial order submission meant to be validated here?",
+     "Constant C_ALLOW_PARTIAL is defined as FALSE on line 4, making the ELSIF branch on lines 116-120 of CANCEL_ORDER dead code that can never execute; should partial cancellation be enabled or removed?",
+     "If the partial cancellation branch (lines 116-120) in CANCEL_ORDER were ever executed, ORD_HDR status is not updated to 'C' nor is RSN_CD recorded, but line 125 still logs 'cancelled'; is this intentional behaviour?",
+     "Are records in ORD_LINE intended to be permanently purged without being saved to an archive table, while ORD_HDR records are preserved?",
+     "Is the archive table ORD_HDR_ARCH_<YYYY> pre-created annually by an external DDL script, or should table creation be handled dynamically if missing?"
+    ]
+   },
+   "doc": {
+    "source_complete": true,
+    "purpose": "The ORD_PROC package manages the end-to-end lifecycle of orders, encompassing order validation, submission, cancellation, and historical archiving. During order submission, it validates order constraints, calculates tier- and channel-based discounts, updates line items, and coordinates invoice generation. It also facilitates order cancellations under eligible statuses and purges aged orders into yearly archive tables.",
+    "procedure_notes": [
+     {
+      "name": "CALC_DISC_PCT",
+      "summary": "Aggregates total order value from ORD_HDR and ORD_LINE, queries the customer level from CUST_MGMT.GET_CST_LVL, and evaluates a tiered discount percentage."
+     },
+     {
+      "name": "VALIDATE_ORDER",
+      "summary": "Validates that the order has status 'N', contains between 1 and G_MAX_LINES (250) line items, and that the associated customer does not have an 'xfl' value of 'P'."
+     },
+     {
+      "name": "SUBMIT_ORDER",
+      "summary": "Validates the specified order, updates its lines with a calculated discount, sets order header status to 'S', attempts to create an invoice and update the status to 'I', and writes an informational log entry."
+     },
+     {
+      "name": "CANCEL_ORDER",
+      "summary": "Locks and validates an order header by ID, updates its status to 'C' with the given reason code if in status 'N' or 'S', and logs the cancellation; raises error -20111 for ineligible statuses."
+     },
+     {
+      "name": "ARCHIVE_ORDERS",
+      "summary": "Inserts qualified orders into a dynamic year-based archive table, deletes matching order lines and order headers, returns the archived count, and logs the action."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Customer level 'G' with an order total of at least 5000 receives a discount of 12%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       24,
+       24
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer level 'G' with an order total under 5000 receives a discount of 8%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       25,
+       25
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer level 'S' using sales channel 'W' during December (month '12') receives a discount of 5%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       26,
+       27
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer level 'S' that does not qualify for the December channel 'W' promotion receives a discount of 3%.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       28,
+       28
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Orders placed through channel 'W' with an order total of at least 2500 receive a discount of 2% if customer level is not 'G' or 'S'.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       29,
+       29
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Orders that do not meet any tier, channel, or seasonal criteria receive a 0% discount.",
+      "implemented_in": "calc_disc_pct",
+      "evidence_lines": [
+       30,
+       30
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order must have a status code of 'N'; otherwise, error -20101 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       47,
+       49
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order must have at least one line item (count cannot be 0); otherwise, error -20102 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       56,
+       57
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order cannot have more lines than G_MAX_LINES (250); otherwise, error -20103 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       58,
+       60
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The customer associated with the order cannot have an 'xfl' flag of 'P'; otherwise, error -20104 is raised.",
+      "implemented_in": "VALIDATE_ORDER",
+      "evidence_lines": [
+       63,
+       65
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Every order line item associated with the order (ORD_ID = P_ORD_ID) is updated with the discount percentage returned by CALC_DISC_PCT.",
+      "implemented_in": "SUBMIT_ORDER",
+      "evidence_lines": [
+       74,
+       78
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When an order is submitted, its header status code (STAT_CD) is initially set to 'S' and its submission date (SUB_DT) is set to SYSDATE.",
+      "implemented_in": "SUBMIT_ORDER",
+      "evidence_lines": [
+       80,
+       83
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "If invoice generation through BILL_CALC.CREATE_INVOICE succeeds, the order header is updated with the invoice identifier (INV_ID) and the status code (STAT_CD) is transitioned to 'I'.",
+      "implemented_in": "SUBMIT_ORDER",
+      "evidence_lines": [
+       86,
+       90
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "An order with status 'N' or 'S' is cancelled by setting ORD_HDR.STAT_CD to 'C' and ORD_HDR.RSN_CD to the provided P_RSN_CD.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       111,
+       115
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When C_ALLOW_PARTIAL is enabled and status is 'I', order lines in ORD_LINE with SHP_QTY = 0 have their QTY updated to 0.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       116,
+       120
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "If the order is not in an eligible status for cancellation, error -20111 is raised with message 'Order <P_ORD_ID> cannot be cancelled in status <STAT_CD>'.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       121,
+       123
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Every successful cancellation is recorded via UTIL_LOG.LOG_MSG with log level 'I', source 'ORD_PROC', and text containing the order ID and reason code.",
+      "implemented_in": "CANCEL_ORDER",
+      "evidence_lines": [
+       125,
+       125
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The retention period defaults to 730 days if no retention period is provided.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       128,
+       131
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The destination archive table name is constructed dynamically as ORD_HDR_ARCH_ followed by the current four-digit year (YYYY).",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       132,
+       132
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Orders are eligible for archiving only when stat_cd is either 'I' or 'C' and sub_dt is older than SYSDATE minus p_keep_days.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       134,
+       136
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Order line records in ORD_LINE matching eligible order headers (stat_cd in 'I' or 'C' and sub_dt older than SYSDATE minus p_keep_days) must be deleted prior to deleting the headers.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       139,
+       144
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Eligible order headers are permanently deleted from ORD_HDR after their lines have been removed.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       146,
+       148
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "A completion log entry is recorded with level 'I', source 'ORD_PROC', reporting the count of archived orders and the target archive table name.",
+      "implemented_in": "ARCHIVE_ORDERS",
+      "evidence_lines": [
+       150,
+       150
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "VALIDATE_ORDER checks that the order is in status 'N', contains between 1 and 250 line items, and that the customer does not have flag 'P'.",
+      "implemented_in": "VALIDATE_ORDER"
+     },
+     {
+      "step": 2,
+      "description": "CALC_DISC_PCT computes the applicable discount percentage based on order total, customer level from CUST_MGMT.GET_CST_LVL, sales channel, and order date.",
+      "implemented_in": "CALC_DISC_PCT"
+     },
+     {
+      "step": 3,
+      "description": "SUBMIT_ORDER orchestrates the submission by validating the order, updating line items with the calculated discount, marking the header status as 'S', invoking BILL_CALC.CREATE_INVOICE to set status 'I', and writing an informational log.",
+      "implemented_in": "SUBMIT_ORDER"
+     },
+     {
+      "step": 4,
+      "description": "CANCEL_ORDER locks and evaluates the order, transitioning orders in status 'N' or 'S' to status 'C' with a reason code and logging the cancellation.",
+      "implemented_in": "CANCEL_ORDER"
+     },
+     {
+      "step": 5,
+      "description": "ARCHIVE_ORDERS purges aged orders in status 'I' or 'C' older than the retention period by archiving header rows into a dynamic yearly archive table, deleting lines and headers, and logging the archived count.",
+      "implemented_in": "ARCHIVE_ORDERS"
+     }
+    ],
+    "edge_cases": [
+     "If P_ORD_ID has no matching records in ORD_HDR or has no lines in ORD_LINE, the function raises an unhandled NO_DATA_FOUND exception.",
+     "If P_ORD_ID links to multiple headers with differing CST_ID or CHAN_CD, the query will return multiple rows and raise an unhandled TOO_MANY_ROWS exception.",
+     "If the calculated order total is NULL, comparisons against numeric thresholds evaluate to false and fall through to subsequent rules or the default 0%.",
+     "If P_ORD_ID does not exist in ORD_HDR, queries in VALIDATE_ORDER or CANCEL_ORDER raise an unhandled NO_DATA_FOUND exception.",
+     "If ORD_HDR contains duplicate records for P_ORD_ID, the query in VALIDATE_ORDER raises an unhandled TOO_MANY_ROWS exception.",
+     "If BILL_CALC.CREATE_INVOICE or the subsequent update to ORD_HDR fails, the exception is swallowed by a WHEN OTHERS handler, leaving the order header with status code 'S' and no invoice reference.",
+     "If STAT_CD is any value other than 'N' or 'S' (including status 'I', since C_ALLOW_PARTIAL is currently set to FALSE), application error -20111 is raised.",
+     "If p_keep_days is passed as NULL, the date calculation evaluates to NULL, resulting in no orders matching the criteria, 0 rows archived, and 0 rows deleted.",
+     "If no orders meet the archive criteria, p_cnt is set to 0, no records are deleted, and a log entry for 0 orders is created.",
+     "If the yearly archive table does not exist, dynamic SQL execution will fail with an unhandled table or view does not exist exception."
+    ],
+    "open_questions": [
+     "What business meanings do customer levels 'G' and 'S' represent (for example, Gold and Silver), and what channel does 'W' correspond to (for example, Web)?",
+     "Should an unhandled NO_DATA_FOUND exception occur when an order has no line items, or should default values (e.g., total 0, discount 0) be returned instead?",
+     "Package-level constants C_SRC and C_ALLOW_PARTIAL are declared in the package body but not referenced in CALC_DISC_PCT; are they used exclusively by other subprograms?",
+     "What business statuses do the codes 'N', 'S', 'I', and 'C' represent in ORD_HDR.STAT_CD?",
+     "What business meaning is associated with the 'xfl' flag and value 'P' checked via CUST_MGMT.CHK_CST_XFL?",
+     "Should missing order records in ORD_HDR be handled with a custom application error rather than an unhandled NO_DATA_FOUND exception across procedures?",
+     "In lines 91-94 of SUBMIT_ORDER, the exception block catches WHEN OTHERS and performs NULL without logging or raising. Should invoice creation failures be silently swallowed leaving the order in status 'S', or should failures be logged or rolled back?",
+     "Package-level constant C_ALLOW_PARTIAL (line 4) is declared but not referenced in SUBMIT_ORDER; is partial order submission meant to be validated here?",
+     "Constant C_ALLOW_PARTIAL is defined as FALSE on line 4, making the ELSIF branch on lines 116-120 of CANCEL_ORDER dead code that can never execute; should partial cancellation be enabled or removed?",
+     "If the partial cancellation branch (lines 116-120) in CANCEL_ORDER were ever executed, ORD_HDR status is not updated to 'C' nor is RSN_CD recorded, but line 125 still logs 'cancelled'; is this intentional behaviour?",
+     "Are records in ORD_LINE intended to be permanently purged without being saved to an archive table, while ORD_HDR records are preserved?",
+     "Is the archive table ORD_HDR_ARCH_<YYYY> pre-created annually by an external DDL script, or should table creation be handled dynamically if missing?"
+    ]
+   },
+   "unit_docs": {
+    "CALC_DISC_PCT": {
+     "source_complete": true,
+     "purpose": "Calculates the discount percentage for a specified order based on total order amount, customer tier, sales channel, and order date.",
+     "procedure_notes": [
+      {
+       "name": "calc_disc_pct",
+       "summary": "Aggregates total order value from ORD_HDR and ORD_LINE, queries the customer level from CUST_MGMT.GET_CST_LVL, and evaluates a tiered discount percentage."
+      }
+     ],
+     "business_rules": [
+      {
+       "rule": "Customer level 'G' with an order total of at least 5000 receives a discount of 12%.",
+       "implemented_in": "calc_disc_pct",
+       "evidence_lines": [
+        24,
+        24
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Customer level 'G' with an order total under 5000 receives a discount of 8%.",
+       "implemented_in": "calc_disc_pct",
+       "evidence_lines": [
+        25,
+        25
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Customer level 'S' using sales channel 'W' during December (month '12') receives a discount of 5%.",
+       "implemented_in": "calc_disc_pct",
+       "evidence_lines": [
+        26,
+        27
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Customer level 'S' that does not qualify for the December channel 'W' promotion receives a discount of 3%.",
+       "implemented_in": "calc_disc_pct",
+       "evidence_lines": [
+        28,
+        28
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Orders placed through channel 'W' with an order total of at least 2500 receive a discount of 2% if customer level is not 'G' or 'S'.",
+       "implemented_in": "calc_disc_pct",
+       "evidence_lines": [
+        29,
+        29
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Orders that do not meet any tier, channel, or seasonal criteria receive a 0% discount.",
+       "implemented_in": "calc_disc_pct",
+       "evidence_lines": [
+        30,
+        30
+       ],
+       "confidence": "high"
+      }
+     ],
+     "main_flow": [
+      {
+       "step": 1,
+       "description": "Query ORD_HDR and ORD_LINE for order ID P_ORD_ID to obtain CST_ID, CHAN_CD, and the sum of QTY multiplied by UNIT_PRC.",
+       "implemented_in": "calc_disc_pct"
+      },
+      {
+       "step": 2,
+       "description": "Call CUST_MGMT.GET_CST_LVL with the retrieved CST_ID to obtain the customer level code.",
+       "implemented_in": "calc_disc_pct"
+      },
+      {
+       "step": 3,
+       "description": "Determine the discount percentage via a CASE expression evaluating customer level, total amount, channel, and current month.",
+       "implemented_in": "calc_disc_pct"
+      },
+      {
+       "step": 4,
+       "description": "Return the calculated discount percentage.",
+       "implemented_in": "calc_disc_pct"
+      }
+     ],
+     "edge_cases": [
+      "If P_ORD_ID has no matching records in ORD_HDR or has no lines in ORD_LINE, the function raises an unhandled NO_DATA_FOUND exception.",
+      "If P_ORD_ID links to multiple headers with differing CST_ID or CHAN_CD, the query will return multiple rows and raise an unhandled TOO_MANY_ROWS exception.",
+      "If the calculated order total is NULL, comparisons against numeric thresholds evaluate to false and fall through to subsequent rules or the default 0%."
+     ],
+     "open_questions": [
+      "What business meanings do customer levels 'G' and 'S' represent (for example, Gold and Silver), and what channel does 'W' correspond to (for example, Web)?",
+      "Should an unhandled NO_DATA_FOUND exception occur when an order has no line items, or should default values (e.g., total 0, discount 0) be returned instead?",
+      "Package-level constants C_SRC and C_ALLOW_PARTIAL are declared in the package body but not referenced in CALC_DISC_PCT; are they used exclusively by other subprograms?"
+     ]
+    },
+    "VALIDATE_ORDER": {
+     "source_complete": true,
+     "purpose": "Validates an order before submission or further processing by checking order status, verifying order line count limits, and checking customer flag restrictions.",
+     "procedure_notes": [
+      {
+       "name": "VALIDATE_ORDER",
+       "summary": "Validates that the order has status 'N', contains between 1 and G_MAX_LINES (250) line items, and that the associated customer does not have an 'xfl' value of 'P'."
+      }
+     ],
+     "business_rules": [
+      {
+       "rule": "An order must have a status code of 'N'; otherwise, error -20101 is raised.",
+       "implemented_in": "VALIDATE_ORDER",
+       "evidence_lines": [
+        47,
+        49
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "An order must have at least one line item (count cannot be 0); otherwise, error -20102 is raised.",
+       "implemented_in": "VALIDATE_ORDER",
+       "evidence_lines": [
+        56,
+        57
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "An order cannot have more lines than G_MAX_LINES (250); otherwise, error -20103 is raised.",
+       "implemented_in": "VALIDATE_ORDER",
+       "evidence_lines": [
+        58,
+        60
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "The customer associated with the order cannot have an 'xfl' flag of 'P'; otherwise, error -20104 is raised.",
+       "implemented_in": "VALIDATE_ORDER",
+       "evidence_lines": [
+        63,
+        65
+       ],
+       "confidence": "high"
+      }
+     ],
+     "main_flow": [
+      {
+       "step": 1,
+       "description": "Fetch the order status STAT_CD and customer ID CST_ID from ORD_HDR for the supplied P_ORD_ID.",
+       "implemented_in": "VALIDATE_ORDER"
+      },
+      {
+       "step": 2,
+       "description": "Verify that the status is 'N', raising error -20101 if it is not.",
+       "implemented_in": "VALIDATE_ORDER"
+      },
+      {
+       "step": 3,
+       "description": "Count the number of line items in ORD_LINE for the order.",
+       "implemented_in": "VALIDATE_ORDER"
+      },
+      {
+       "step": 4,
+       "description": "Verify that the line count is greater than 0 and does not exceed G_MAX_LINES (250), raising error -20102 or -20103 respectively if violated.",
+       "implemented_in": "VALIDATE_ORDER"
+      },
+      {
+       "step": 5,
+       "description": "Call CUST_MGMT.CHK_CST_XFL to retrieve the customer flag and raise error -20104 if the flag equals 'P'.",
+       "implemented_in": "VALIDATE_ORDER"
+      }
+     ],
+     "edge_cases": [
+      "If P_ORD_ID does not exist in ORD_HDR, the query raises an unhandled NO_DATA_FOUND exception.",
+      "If ORD_HDR contains duplicate records for P_ORD_ID, the query raises an unhandled TOO_MANY_ROWS exception."
+     ],
+     "open_questions": [
+      "What business status does the code 'N' represent in ORD_HDR.STAT_CD?",
+      "What business meaning is associated with the 'xfl' flag and value 'P' checked via CUST_MGMT.CHK_CST_XFL?",
+      "Should missing order records in ORD_HDR be handled with a custom application error rather than an unhandled NO_DATA_FOUND exception?"
+     ]
+    },
+    "SUBMIT_ORDER": {
+     "source_complete": true,
+     "purpose": "Processes the submission of an order by validating it, applying a calculated discount to its line items, updating order header submission status and timestamp, attempting invoice generation, and logging the outcome.",
+     "procedure_notes": [
+      {
+       "name": "SUBMIT_ORDER",
+       "summary": "Validates the specified order, updates its lines with a calculated discount, sets order header status to 'S', attempts to create an invoice and update the status to 'I', and writes an informational log entry."
+      }
+     ],
+     "business_rules": [
+      {
+       "rule": "Every order line item associated with the order (ORD_ID = P_ORD_ID) is updated with the discount percentage returned by CALC_DISC_PCT.",
+       "implemented_in": "SUBMIT_ORDER",
+       "evidence_lines": [
+        74,
+        78
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "When an order is submitted, its header status code (STAT_CD) is initially set to 'S' and its submission date (SUB_DT) is set to SYSDATE.",
+       "implemented_in": "SUBMIT_ORDER",
+       "evidence_lines": [
+        80,
+        83
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "If invoice generation through BILL_CALC.CREATE_INVOICE succeeds, the order header is updated with the invoice identifier (INV_ID) and the status code (STAT_CD) is transitioned to 'I'.",
+       "implemented_in": "SUBMIT_ORDER",
+       "evidence_lines": [
+        86,
+        90
+       ],
+       "confidence": "high"
+      }
+     ],
+     "main_flow": [
+      {
+       "step": 1,
+       "description": "Call VALIDATE_ORDER to validate the order before processing.",
+       "implemented_in": "SUBMIT_ORDER"
+      },
+      {
+       "step": 2,
+       "description": "Calculate the discount percentage for the order by calling CALC_DISC_PCT.",
+       "implemented_in": "SUBMIT_ORDER"
+      },
+      {
+       "step": 3,
+       "description": "Update ORD_LINE setting DISC_PCT for all lines matching P_ORD_ID.",
+       "implemented_in": "SUBMIT_ORDER"
+      },
+      {
+       "step": 4,
+       "description": "Update ORD_HDR setting STAT_CD to 'S' and SUB_DT to SYSDATE.",
+       "implemented_in": "SUBMIT_ORDER"
+      },
+      {
+       "step": 5,
+       "description": "Call BILL_CALC.CREATE_INVOICE to create an invoice, and update ORD_HDR with INV_ID and STAT_CD 'I'.",
+       "implemented_in": "SUBMIT_ORDER"
+      },
+      {
+       "step": 6,
+       "description": "Log an informational message via UTIL_LOG.LOG_MSG with level 'I', source 'ORD_PROC', order ID, and discount percentage.",
+       "implemented_in": "SUBMIT_ORDER"
+      }
+     ],
+     "edge_cases": [
+      "If BILL_CALC.CREATE_INVOICE or the subsequent update to ORD_HDR fails, the exception is swallowed by a WHEN OTHERS handler, leaving the order header with status code 'S' and no invoice reference."
+     ],
+     "open_questions": [
+      "In lines 91-94, the exception block catches WHEN OTHERS and performs NULL without logging or raising. Should invoice creation failures be silently swallowed leaving the order in status 'S', or should failures be logged or rolled back?",
+      "Package-level constant C_ALLOW_PARTIAL (line 4) is declared but not referenced in SUBMIT_ORDER; is partial order submission meant to be validated here?"
+     ]
+    },
+    "CANCEL_ORDER": {
+     "source_complete": true,
+     "purpose": "Cancels an order in ORD_HDR if its status is eligible ('N' or 'S') by updating the status to 'C' and recording the cancellation reason, with conditionally compiled logic for partial cancellation in status 'I'.",
+     "procedure_notes": [
+      {
+       "name": "CANCEL_ORDER",
+       "summary": "Locks and validates an order header by ID, updates its status to 'C' with the given reason code if in status 'N' or 'S', and logs the cancellation; raises error -20111 for ineligible statuses."
+      }
+     ],
+     "business_rules": [
+      {
+       "rule": "An order with status 'N' or 'S' is cancelled by setting ORD_HDR.STAT_CD to 'C' and ORD_HDR.RSN_CD to the provided P_RSN_CD.",
+       "implemented_in": "CANCEL_ORDER",
+       "evidence_lines": [
+        111,
+        115
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "When C_ALLOW_PARTIAL is enabled and status is 'I', order lines in ORD_LINE with SHP_QTY = 0 have their QTY updated to 0.",
+       "implemented_in": "CANCEL_ORDER",
+       "evidence_lines": [
+        116,
+        120
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "If the order is not in an eligible status for cancellation, error -20111 is raised with message 'Order <P_ORD_ID> cannot be cancelled in status <STAT_CD>'.",
+       "implemented_in": "CANCEL_ORDER",
+       "evidence_lines": [
+        121,
+        123
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Every successful cancellation is recorded via UTIL_LOG.LOG_MSG with log level 'I', source 'ORD_PROC', and text containing the order ID and reason code.",
+       "implemented_in": "CANCEL_ORDER",
+       "evidence_lines": [
+        125,
+        125
+       ],
+       "confidence": "high"
+      }
+     ],
+     "main_flow": [
+      {
+       "step": 1,
+       "description": "Lock and retrieve the current STAT_CD from ORD_HDR for the specified P_ORD_ID.",
+       "implemented_in": "CANCEL_ORDER"
+      },
+      {
+       "step": 2,
+       "description": "If STAT_CD is 'N' or 'S', update ORD_HDR to set STAT_CD = 'C' and RSN_CD = P_RSN_CD.",
+       "implemented_in": "CANCEL_ORDER"
+      },
+      {
+       "step": 3,
+       "description": "If STAT_CD is 'I' and C_ALLOW_PARTIAL is TRUE, set QTY to 0 for unfulfilled lines (SHP_QTY = 0) in ORD_LINE; otherwise, raise application error -20111.",
+       "implemented_in": "CANCEL_ORDER"
+      },
+      {
+       "step": 4,
+       "description": "Call UTIL_LOG.LOG_MSG to log the cancellation event.",
+       "implemented_in": "CANCEL_ORDER"
+      }
+     ],
+     "edge_cases": [
+      "If P_ORD_ID does not exist in ORD_HDR, the SELECT FOR UPDATE raises an unhandled NO_DATA_FOUND exception.",
+      "If STAT_CD is any value other than 'N' or 'S' (including status 'I', since C_ALLOW_PARTIAL is currently set to FALSE), application error -20111 is raised."
+     ],
+     "open_questions": [
+      "Constant C_ALLOW_PARTIAL is defined as FALSE on line 4, making the ELSIF branch on lines 116-120 dead code that can never execute; should partial cancellation be enabled or removed?",
+      "If the partial cancellation branch (lines 116-120) were ever executed, ORD_HDR status is not updated to 'C' nor is RSN_CD recorded, but line 125 still logs 'cancelled'; is this intentional behaviour?",
+      "What business statuses do the codes 'N', 'S', 'I', and 'C' represent?"
+     ]
+    },
+    "ARCHIVE_ORDERS": {
+     "source_complete": true,
+     "purpose": "Archives completed or inactive order headers older than a specified number of days into a yearly archive table, deletes corresponding order lines and headers, and logs the archived count.",
+     "procedure_notes": [
+      {
+       "name": "ARCHIVE_ORDERS",
+       "summary": "Inserts qualified orders into a dynamic year-based archive table, deletes matching order lines and order headers, returns the archived count, and logs the action."
+      }
+     ],
+     "business_rules": [
+      {
+       "rule": "The retention period defaults to 730 days if no retention period is provided.",
+       "implemented_in": "ARCHIVE_ORDERS",
+       "evidence_lines": [
+        128,
+        131
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "The destination archive table name is constructed dynamically as ORD_HDR_ARCH_ followed by the current four-digit year (YYYY).",
+       "implemented_in": "ARCHIVE_ORDERS",
+       "evidence_lines": [
+        132,
+        132
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Orders are eligible for archiving only when stat_cd is either 'I' or 'C' and sub_dt is older than SYSDATE minus p_keep_days.",
+       "implemented_in": "ARCHIVE_ORDERS",
+       "evidence_lines": [
+        134,
+        136
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Order line records in ORD_LINE matching eligible order headers (stat_cd in 'I' or 'C' and sub_dt older than SYSDATE minus p_keep_days) must be deleted prior to deleting the headers.",
+       "implemented_in": "ARCHIVE_ORDERS",
+       "evidence_lines": [
+        139,
+        144
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "Eligible order headers are permanently deleted from ORD_HDR after their lines have been removed.",
+       "implemented_in": "ARCHIVE_ORDERS",
+       "evidence_lines": [
+        146,
+        148
+       ],
+       "confidence": "high"
+      },
+      {
+       "rule": "A completion log entry is recorded with level 'I', source 'ORD_PROC', reporting the count of archived orders and the target archive table name.",
+       "implemented_in": "ARCHIVE_ORDERS",
+       "evidence_lines": [
+        150,
+        150
+       ],
+       "confidence": "high"
+      }
+     ],
+     "main_flow": [
+      {
+       "step": 1,
+       "description": "Construct target archive table name using the current year.",
+       "implemented_in": "ARCHIVE_ORDERS"
+      },
+      {
+       "step": 2,
+       "description": "Execute dynamic SQL to copy matching ORD_HDR records into the target archive table and capture row count in p_cnt.",
+       "implemented_in": "ARCHIVE_ORDERS"
+      },
+      {
+       "step": 3,
+       "description": "Delete order lines from ORD_LINE that belong to the matching orders.",
+       "implemented_in": "ARCHIVE_ORDERS"
+      },
+      {
+       "step": 4,
+       "description": "Delete the matching order headers from ORD_HDR.",
+       "implemented_in": "ARCHIVE_ORDERS"
+      },
+      {
+       "step": 5,
+       "description": "Call UTIL_LOG.LOG_MSG to log the number of archived orders and destination table.",
+       "implemented_in": "ARCHIVE_ORDERS"
+      }
+     ],
+     "edge_cases": [
+      "If p_keep_days is passed as NULL, the date calculation evaluates to NULL, resulting in no orders matching the criteria, 0 rows archived, and 0 rows deleted.",
+      "If no orders meet the archive criteria, p_cnt is set to 0, no records are deleted, and a log entry for 0 orders is created.",
+      "If the yearly archive table does not exist, dynamic SQL execution will fail with an unhandled table or view does not exist exception."
+     ],
+     "open_questions": [
+      "Are records in ORD_LINE intended to be permanently purged without being saved to an archive table, while ORD_HDR records are preserved?",
+      "Is the archive table ORD_HDR_ARCH_<YYYY> pre-created annually by an external DDL script, or should table creation be handled dynamically if missing?",
+      "What business states do codes 'I' and 'C' represent in ORD_HDR.STAT_CD?"
+     ]
+    }
+   }
+  },
+  {
+   "name": "UTIL_LOG",
+   "ok": true,
+   "error": null,
+   "mode": "whole",
+   "source_hash": null,
+   "metrics": {
+    "subprograms": 2,
+    "subprograms_with_note": 2,
+    "tables": 1,
+    "tables_on_page": 1,
+    "rules": 2,
+    "rules_valid_evidence": 2,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 2
+   },
+   "findings": [],
+   "calls": [
+    {
+     "unit": "UTIL_LOG",
+     "purpose": "unit",
+     "input_tokens": 2906,
+     "output_tokens": 1668,
+     "latency_s": 135.78,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    }
+   ],
+   "raw_doc": {
+    "source_complete": true,
+    "purpose": "Provides utility routines for autonomous logging into the application log table and formatting numeric amounts as currency or standard decimal strings.",
+    "procedure_notes": [
+     {
+      "name": "LOG_MSG",
+      "summary": "Records an application log message in APP_LOG in an autonomous transaction, truncating text to 4000 characters and committing immediately."
+     },
+     {
+      "name": "FMT_AMT",
+      "summary": "Formats a number into a string using the mask FM999G999G990D00, treating NULL input as 0."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Log message text is restricted to a maximum length of 4000 characters by truncating longer inputs.",
+      "implemented_in": "LOG_MSG",
+      "evidence_lines": [
+       10,
+       11
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Numeric amounts are formatted using the pattern 'FM999G999G990D00', substituting 0 when the input amount is NULL.",
+      "implemented_in": "FMT_AMT",
+      "evidence_lines": [
+       20,
+       20
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Generate an entry in APP_LOG with the next APP_LOG_SEQ sequence value, current timestamp, logging level, source, and text truncated to 4000 characters.",
+      "implemented_in": "LOG_MSG"
+     },
+     {
+      "step": 2,
+      "description": "Commit the autonomous transaction independently of the caller's transaction.",
+      "implemented_in": "LOG_MSG"
+     }
+    ],
+    "edge_cases": [
+     "If an error occurs while writing or committing the log message in LOG_MSG, the exception is caught and silently ignored.",
+     "If P_AMT is NULL in FMT_AMT, NVL converts it to 0 before formatting.",
+     "If P_TXT exceeds 4000 characters in LOG_MSG, characters beyond index 4000 are omitted."
+    ],
+    "open_questions": [
+     "LOG_MSG uses a WHEN OTHERS THEN NULL handler that silently swallows all errors (such as sequence exhaustion or table unavailability). Is this intended to ensure calling transactions never fail, or should failures be surfaced or alerted elsewhere?",
+     "Why is number formatting (FMT_AMT) placed in UTIL_LOG rather than a general formatting or financial utility package?"
+    ]
+   },
+   "doc": {
+    "source_complete": true,
+    "purpose": "Provides utility routines for autonomous logging into the application log table and formatting numeric amounts as currency or standard decimal strings.",
+    "procedure_notes": [
+     {
+      "name": "LOG_MSG",
+      "summary": "Records an application log message in APP_LOG in an autonomous transaction, truncating text to 4000 characters and committing immediately."
+     },
+     {
+      "name": "FMT_AMT",
+      "summary": "Formats a number into a string using the mask FM999G999G990D00, treating NULL input as 0."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Log message text is restricted to a maximum length of 4000 characters by truncating longer inputs.",
+      "implemented_in": "LOG_MSG",
+      "evidence_lines": [
+       10,
+       11
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Numeric amounts are formatted using the pattern 'FM999G999G990D00', substituting 0 when the input amount is NULL.",
+      "implemented_in": "FMT_AMT",
+      "evidence_lines": [
+       20,
+       20
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Generate an entry in APP_LOG with the next APP_LOG_SEQ sequence value, current timestamp, logging level, source, and text truncated to 4000 characters.",
+      "implemented_in": "LOG_MSG"
+     },
+     {
+      "step": 2,
+      "description": "Commit the autonomous transaction independently of the caller's transaction.",
+      "implemented_in": "LOG_MSG"
+     }
+    ],
+    "edge_cases": [
+     "If an error occurs while writing or committing the log message in LOG_MSG, the exception is caught and silently ignored.",
+     "If P_AMT is NULL in FMT_AMT, NVL converts it to 0 before formatting.",
+     "If P_TXT exceeds 4000 characters in LOG_MSG, characters beyond index 4000 are omitted."
+    ],
+    "open_questions": [
+     "LOG_MSG uses a WHEN OTHERS THEN NULL handler that silently swallows all errors (such as sequence exhaustion or table unavailability). Is this intended to ensure calling transactions never fail, or should failures be surfaced or alerted elsewhere?",
+     "Why is number formatting (FMT_AMT) placed in UTIL_LOG rather than a general formatting or financial utility package?"
+    ]
+   },
+   "unit_docs": {}
+  }
+ ]
+}

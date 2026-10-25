@@ -7,9 +7,12 @@ pydantic, because the API does not enforce every keyword (e.g. `minLength`).
 
 Retries are ours, not the SDK's (the SDK does not retry unless `retry_options`
 is set): 429 and 5xx/timeouts back off with full jitter, honouring the server's
-RetryInfo delay. A daily quota is not retried, since waiting minutes would not
-help. Error messages carry the HTTP status and Google's error message only; the
-API key is never part of a message.
+RetryInfo delay. 503 ("model is overloaded") is retried at most
+`llm_overload_max_retries` times, waiting at least `llm_overload_min_delay_s`
+each time: overload spikes last minutes, and on the free tier every rejected
+request still counts against the daily quota. A daily quota is not retried,
+since waiting minutes would not help. Error messages carry the HTTP status and
+Google's error message only; the API key is never part of a message.
 """
 
 from __future__ import annotations
@@ -26,9 +29,17 @@ from google.genai import errors, types
 from pydantic import BaseModel
 
 from docgen.config import Settings
-from docgen.llm.base import LLMError, LLMResponse, RateLimitError, TransientLLMError
+from docgen.llm.base import (
+    LLMError,
+    LLMResponse,
+    OverloadedError,
+    QuotaExhaustedError,
+    RateLimitError,
+    TransientLLMError,
+    make_classifier,
+)
 from docgen.llm.schema import inline_schema
-from docgen.retry import RetryDecision, RetryPolicy, call_with_retry
+from docgen.retry import RetryPolicy, call_with_retry
 
 log = logging.getLogger(__name__)
 
@@ -65,20 +76,16 @@ def translate_error(exc: Exception) -> Exception:
         summary = f"Gemini API error {exc.code} {exc.status or ''}: {exc.message or ''}".strip()
         if exc.code == 429:
             if _is_daily_quota(exc):
-                return LLMError(summary + " (daily quota exhausted; not retrying)")
+                return QuotaExhaustedError(summary + " (daily quota exhausted; not retrying)")
             return RateLimitError(summary, retry_after_s=_retry_delay_s(exc))
-        if exc.code in (408, 500, 502, 503, 504):
+        if exc.code == 503:
+            return OverloadedError(summary)
+        if exc.code in (408, 500, 502, 504):
             return TransientLLMError(summary)
         return LLMError(summary)
     if isinstance(exc, httpx.TimeoutException | httpx.NetworkError):
         return TransientLLMError(f"Gemini transport error: {type(exc).__name__}")
     return exc
-
-
-def classify(exc: Exception) -> RetryDecision:
-    if isinstance(exc, RateLimitError):
-        return RetryDecision(True, exc.retry_after_s)
-    return RetryDecision(isinstance(exc, TransientLLMError))
 
 
 class GeminiClient:
@@ -98,6 +105,9 @@ class GeminiClient:
             max_retries=settings.llm_max_retries,
             base_s=settings.llm_backoff_base_s,
             cap_s=settings.llm_backoff_max_s,
+        )
+        self._classify = make_classifier(
+            settings.llm_overload_min_delay_s, settings.llm_overload_max_retries
         )
         self._sleep = sleep
         self._client = client or genai.Client(
@@ -141,7 +151,11 @@ class GeminiClient:
 
         started = time.monotonic()
         response, attempts = call_with_retry(
-            once, classify=classify, policy=self._policy, what="Gemini call", sleep=self._sleep
+            once,
+            classify=self._classify,
+            policy=self._policy,
+            what="Gemini call",
+            sleep=self._sleep,
         )
         latency = time.monotonic() - started
 

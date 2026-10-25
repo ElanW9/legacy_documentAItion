@@ -91,3 +91,9 @@ def test_page_coverage_reports_missing_tables():
     assert check_page_coverage(facts, " ".join(t.table for t in facts.tables)) == []
     missing = check_page_coverage(facts, "")
     assert len(missing) == len(facts.tables)
+
+
+def test_oracle_builtins_are_not_faithfulness_violations():
+    facts, body, _ = _ord_proc()
+    text = "An unhandled NO_DATA_FOUND or TOO_MANY_ROWS propagates; the DDL commits implicitly."
+    assert unknown_identifiers(text, known_identifiers(facts, body)) == []

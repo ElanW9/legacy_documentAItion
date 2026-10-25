@@ -1,0 +1,826 @@
+{
+ "run_id": "20261024T091815Z_gemini-3.8-flash_v2_abbrev-rule",
+ "created_at": "2026-10-24T09:18:15.601959Z",
+ "resumed_at": [
+  "2026-10-25T16:07:50.730719Z",
+  "2026-10-25T16:28:40.350984Z"
+ ],
+ "label": "abbrev-rule",
+ "commit": "6244a1c953ecf9dfc45d81e25ef8ff8e41c016da+dirty, 46001b428bab14b9d5ec7be182937d484022018f, 7b3ff26125e2a3648d76382e87e6034d2298de53",
+ "model": "gemini-3.8-flash",
+ "prompt_version": "v2",
+ "prompt_fingerprint": "7f8df36e1994aba3",
+ "settings": {
+  "chunk_threshold_lines": 150,
+  "llm_temperature": null,
+  "gemini_thinking_level": null,
+  "schema_in_prompt": true,
+  "cache_used": false
+ },
+ "ground_truth_version": 2,
+ "summary": {
+  "packages": 4,
+  "failed": 2,
+  "coverage_pct": 100.0,
+  "notes_coverage_pct": 100.0,
+  "tables_coverage_pct": 100.0,
+  "faithfulness_violations": 0,
+  "rules": 16,
+  "evidence_valid_pct": 100.0,
+  "traps_found": 4,
+  "traps_total": 9,
+  "trap_evidence_hits": 0,
+  "trap_evidence_total": 0,
+  "hallucinations": 0,
+  "llm_calls": 2,
+  "validation_retries": 0,
+  "tokens_in": 10225,
+  "tokens_out": 4600,
+  "latency_s": 242.1
+ },
+ "original_summary": null,
+ "rescored_at": null,
+ "traps": [
+  {
+   "id": "T1-hidden-case-rule",
+   "type": "hidden_business_rule",
+   "package": "ORD_PROC",
+   "procedure": "CALC_DISC_PCT",
+   "found": false,
+   "found_in": null,
+   "matched_text": null,
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": true
+  },
+  {
+   "id": "T2a-dead-procedure",
+   "type": "dead_code",
+   "package": "CUST_MGMT",
+   "procedure": "REBUILD_CST_IDX",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "REBUILD_CST_IDX is a private procedure that is never called within the package; should it be exposed in the package specification or called by another procedure?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T2b-unreachable-branch",
+   "type": "dead_code",
+   "package": "ORD_PROC",
+   "procedure": "CANCEL_ORDER",
+   "found": false,
+   "found_in": null,
+   "matched_text": null,
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": true
+  },
+  {
+   "id": "T3-cross-package-call",
+   "type": "cross_package_call",
+   "package": "ORD_PROC",
+   "procedure": "SUBMIT_ORDER",
+   "found": false,
+   "found_in": null,
+   "matched_text": null,
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": true
+  },
+  {
+   "id": "T4-magic-number",
+   "type": "magic_number",
+   "package": "BILL_CALC",
+   "procedure": "CALC_LATE_FEE",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "What is the business meaning of the 47 days threshold, the 0.015 factor, the 30-day interval, and the 7.5 minimum amount in CALC_LATE_FEE?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T5a-swallowed-exception-invoice",
+   "type": "swallowed_exception",
+   "package": "ORD_PROC",
+   "procedure": "SUBMIT_ORDER",
+   "found": false,
+   "found_in": null,
+   "matched_text": null,
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": true
+  },
+  {
+   "id": "T5b-swallowed-exception-logging",
+   "type": "swallowed_exception",
+   "package": "UTIL_LOG",
+   "procedure": "LOG_MSG",
+   "found": false,
+   "found_in": null,
+   "matched_text": null,
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": true
+  },
+  {
+   "id": "T6-cryptic-naming",
+   "type": "cryptic_naming",
+   "package": "CUST_MGMT",
+   "procedure": "CHK_CST_XFL",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "What do typ_cd 'K' and output flag values 'Y', 'P', and 'N' represent functionally in CHK_CST_XFL?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  },
+  {
+   "id": "T7-commented-out-block",
+   "type": "commented_out_logic",
+   "package": "BILL_CALC",
+   "procedure": "CREATE_INVOICE",
+   "found": true,
+   "found_in": "open_questions",
+   "matched_text": "Lines 65-70 contain commented-out logic for a 'KMO discount, disabled 2009' where v_lvl = 'G' applied a 5% discount; should this code and the preceding call to CUST_MGMT.GET_CST_LVL on line 63 be permanently removed since v_lvl is never used?",
+   "evidence_hit": null,
+   "hallucinated": false,
+   "found_in_unit_doc": null,
+   "package_failed": false
+  }
+ ],
+ "packages": [
+  {
+   "name": "BILL_CALC",
+   "ok": true,
+   "error": null,
+   "mode": "whole",
+   "source_hash": "fa1791cefe41bce30020d6897a07bd041af9eaad95647296f21d53e72f97d45b",
+   "metrics": {
+    "subprograms": 3,
+    "subprograms_with_note": 3,
+    "tables": 4,
+    "tables_on_page": 4,
+    "rules": 7,
+    "rules_valid_evidence": 7,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 4
+   },
+   "findings": [],
+   "calls": [
+    {
+     "unit": "BILL_CALC",
+     "purpose": "unit",
+     "input_tokens": 5088,
+     "output_tokens": 2828,
+     "latency_s": 115.09,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    }
+   ],
+   "raw_doc": {
+    "source_complete": true,
+    "purpose": "Provides billing calculations and invoice creation, including invoice line item amount calculations, late fee evaluations for overdue invoices, and invoice generation with customer balance updates.",
+    "procedure_notes": [
+     {
+      "name": "CALC_LINE_AMT",
+      "summary": "Calculates the net line amount for a given quantity, price, and discount percentage, rounding the result to two decimal places."
+     },
+     {
+      "name": "CALC_LATE_FEE",
+      "summary": "Computes late fees on overdue invoices exceeding 47 days past due, applying a 1.5% fee per 30-day block with a minimum charge of 7.5."
+     },
+     {
+      "name": "CREATE_INVOICE",
+      "summary": "Generates a new invoice from order lines, calculates standard VAT at 21%, stores the invoice in INV_HDR, updates customer balance in CST_BAL, and logs the operation."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Line amounts are rounded to 2 decimal places per line rather than per invoice, calculated as p_qty * p_price * (1 - NVL(p_disc, 0) / 100), noting code comments indicate this is required by the accounting package import.",
+      "implemented_in": "CALC_LINE_AMT",
+      "evidence_lines": [
+       12,
+       13
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoices overdue by more than 47 days incur a late fee calculated as the greater of 7.5 or the invoice open amount (v_open) multiplied by 0.015 for each 30-day period overdue (CEIL(v_days / 30)), rounded to 2 decimal places.",
+      "implemented_in": "CALC_LATE_FEE",
+      "evidence_lines": [
+       32,
+       33
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoices overdue by 47 days or fewer incur a late fee of 0.",
+      "implemented_in": "CALC_LATE_FEE",
+      "evidence_lines": [
+       34,
+       35
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "If an invoice record is not found in INV_HDR, the late fee is 0.",
+      "implemented_in": "CALC_LATE_FEE",
+      "evidence_lines": [
+       40,
+       41
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoice due date is set to 30 days after the invoice creation date (TRUNC(SYSDATE) + 30).",
+      "implemented_in": "CREATE_INVOICE",
+      "evidence_lines": [
+       75,
+       75
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Standard VAT rate of 0.21 (C_VAT_STD) is applied to calculate vat_amt as ROUND(v_net * 0.21, 2) and total open_amt as ROUND(v_net * (1 + 0.21), 2).",
+      "implemented_in": "CREATE_INVOICE",
+      "evidence_lines": [
+       76,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The invoice total gross amount ROUND(v_net * (1 + C_VAT_STD), 2) is added to the customer balance in CST_BAL, inserting a new record if one does not already exist.",
+      "implemented_in": "CREATE_INVOICE",
+      "evidence_lines": [
+       78,
+       84
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Fetch the customer ID associated with the order from ORD_HDR.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 2,
+      "description": "Iterate over order lines in ORD_LINE, calculate each line total using CALC_LINE_AMT, and accumulate the total net amount.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 3,
+      "description": "Fetch customer level via CUST_MGMT.GET_CST_LVL.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 4,
+      "description": "Generate a new invoice identifier from sequence INV_SEQ.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 5,
+      "description": "Insert the invoice record into INV_HDR with invoice date, due date (plus 30 days), net amount, VAT amount, and total open amount.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 6,
+      "description": "Merge the gross invoice amount into the customer balance table CST_BAL.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 7,
+      "description": "Log informational message with invoice ID, order ID, and formatted net amount using UTIL_LOG.LOG_MSG.",
+      "implemented_in": "CREATE_INVOICE"
+     }
+    ],
+    "edge_cases": [
+     "In CALC_LATE_FEE, if the invoice ID does not exist in INV_HDR, a NO_DATA_FOUND exception is caught and returns a fee of 0.",
+     "In CALC_LATE_FEE, if reference date P_REF_DT is on or before the due date (v_days <= 0), the function returns 0.",
+     "In CALC_LINE_AMT, if P_DISC is NULL, NVL defaults the discount rate to 0.",
+     "In CREATE_INVOICE, if an order has no rows in ORD_LINE, v_net remains 0, creating an invoice with 0 amounts and merging 0 into CST_BAL."
+    ],
+    "open_questions": [
+     "Lines 65-70 contain commented-out logic for a 'KMO discount, disabled 2009' where v_lvl = 'G' applied a 5% discount; should this code and the preceding call to CUST_MGMT.GET_CST_LVL on line 63 be permanently removed since v_lvl is never used?",
+     "What is the business meaning of the 47 days threshold, the 0.015 factor, the 30-day interval, and the 7.5 minimum amount in CALC_LATE_FEE?",
+     "Why does CALC_LATE_FEE return 0 if an invoice ID does not exist instead of raising an error or returning NULL?",
+     "In CREATE_INVOICE, if P_ORD_ID does not exist in ORD_HDR, an unhandled NO_DATA_FOUND exception will be raised. Is this the intended behavior?"
+    ]
+   },
+   "doc": {
+    "source_complete": true,
+    "purpose": "Provides billing calculations and invoice creation, including invoice line item amount calculations, late fee evaluations for overdue invoices, and invoice generation with customer balance updates.",
+    "procedure_notes": [
+     {
+      "name": "CALC_LINE_AMT",
+      "summary": "Calculates the net line amount for a given quantity, price, and discount percentage, rounding the result to two decimal places."
+     },
+     {
+      "name": "CALC_LATE_FEE",
+      "summary": "Computes late fees on overdue invoices exceeding 47 days past due, applying a 1.5% fee per 30-day block with a minimum charge of 7.5."
+     },
+     {
+      "name": "CREATE_INVOICE",
+      "summary": "Generates a new invoice from order lines, calculates standard VAT at 21%, stores the invoice in INV_HDR, updates customer balance in CST_BAL, and logs the operation."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "Line amounts are rounded to 2 decimal places per line rather than per invoice, calculated as p_qty * p_price * (1 - NVL(p_disc, 0) / 100), noting code comments indicate this is required by the accounting package import.",
+      "implemented_in": "CALC_LINE_AMT",
+      "evidence_lines": [
+       12,
+       13
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoices overdue by more than 47 days incur a late fee calculated as the greater of 7.5 or the invoice open amount (v_open) multiplied by 0.015 for each 30-day period overdue (CEIL(v_days / 30)), rounded to 2 decimal places.",
+      "implemented_in": "CALC_LATE_FEE",
+      "evidence_lines": [
+       32,
+       33
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoices overdue by 47 days or fewer incur a late fee of 0.",
+      "implemented_in": "CALC_LATE_FEE",
+      "evidence_lines": [
+       34,
+       35
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "If an invoice record is not found in INV_HDR, the late fee is 0.",
+      "implemented_in": "CALC_LATE_FEE",
+      "evidence_lines": [
+       40,
+       41
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Invoice due date is set to 30 days after the invoice creation date (TRUNC(SYSDATE) + 30).",
+      "implemented_in": "CREATE_INVOICE",
+      "evidence_lines": [
+       75,
+       75
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Standard VAT rate of 0.21 (C_VAT_STD) is applied to calculate vat_amt as ROUND(v_net * 0.21, 2) and total open_amt as ROUND(v_net * (1 + 0.21), 2).",
+      "implemented_in": "CREATE_INVOICE",
+      "evidence_lines": [
+       76,
+       76
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "The invoice total gross amount ROUND(v_net * (1 + C_VAT_STD), 2) is added to the customer balance in CST_BAL, inserting a new record if one does not already exist.",
+      "implemented_in": "CREATE_INVOICE",
+      "evidence_lines": [
+       78,
+       84
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "Fetch the customer ID associated with the order from ORD_HDR.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 2,
+      "description": "Iterate over order lines in ORD_LINE, calculate each line total using CALC_LINE_AMT, and accumulate the total net amount.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 3,
+      "description": "Fetch customer level via CUST_MGMT.GET_CST_LVL.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 4,
+      "description": "Generate a new invoice identifier from sequence INV_SEQ.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 5,
+      "description": "Insert the invoice record into INV_HDR with invoice date, due date (plus 30 days), net amount, VAT amount, and total open amount.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 6,
+      "description": "Merge the gross invoice amount into the customer balance table CST_BAL.",
+      "implemented_in": "CREATE_INVOICE"
+     },
+     {
+      "step": 7,
+      "description": "Log informational message with invoice ID, order ID, and formatted net amount using UTIL_LOG.LOG_MSG.",
+      "implemented_in": "CREATE_INVOICE"
+     }
+    ],
+    "edge_cases": [
+     "In CALC_LATE_FEE, if the invoice ID does not exist in INV_HDR, a NO_DATA_FOUND exception is caught and returns a fee of 0.",
+     "In CALC_LATE_FEE, if reference date P_REF_DT is on or before the due date (v_days <= 0), the function returns 0.",
+     "In CALC_LINE_AMT, if P_DISC is NULL, NVL defaults the discount rate to 0.",
+     "In CREATE_INVOICE, if an order has no rows in ORD_LINE, v_net remains 0, creating an invoice with 0 amounts and merging 0 into CST_BAL."
+    ],
+    "open_questions": [
+     "Lines 65-70 contain commented-out logic for a 'KMO discount, disabled 2009' where v_lvl = 'G' applied a 5% discount; should this code and the preceding call to CUST_MGMT.GET_CST_LVL on line 63 be permanently removed since v_lvl is never used?",
+     "What is the business meaning of the 47 days threshold, the 0.015 factor, the 30-day interval, and the 7.5 minimum amount in CALC_LATE_FEE?",
+     "Why does CALC_LATE_FEE return 0 if an invoice ID does not exist instead of raising an error or returning NULL?",
+     "In CREATE_INVOICE, if P_ORD_ID does not exist in ORD_HDR, an unhandled NO_DATA_FOUND exception will be raised. Is this the intended behavior?"
+    ]
+   },
+   "unit_docs": {}
+  },
+  {
+   "name": "CUST_MGMT",
+   "ok": true,
+   "error": null,
+   "mode": "whole",
+   "source_hash": "e26585a0d16c3c50a9789da87f855ab51ead1027f7d2628ec29bdab83f2ee9a5",
+   "metrics": {
+    "subprograms": 4,
+    "subprograms_with_note": 4,
+    "tables": 4,
+    "tables_on_page": 4,
+    "rules": 9,
+    "rules_valid_evidence": 9,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 4
+   },
+   "findings": [],
+   "calls": [
+    {
+     "unit": "CUST_MGMT",
+     "purpose": "unit",
+     "input_tokens": 5137,
+     "output_tokens": 1772,
+     "latency_s": 127.05,
+     "attempts": 1,
+     "validation_retries": 0,
+     "cached": false
+    }
+   ],
+   "raw_doc": {
+    "source_complete": true,
+    "purpose": "Provides utilities for managing customer data, including calculating customer service levels, updating customer status codes with audit history, evaluating cross-border flags, and rebuilding a search index.",
+    "procedure_notes": [
+     {
+      "name": "GET_CST_LVL",
+      "summary": "Calculates and returns a customer's level code ('G', 'S', or 'B') based on total invoice amounts over the last 12 months and customer tenure in years."
+     },
+     {
+      "name": "UPD_CST_STAT",
+      "summary": "Updates a customer's status code in CST_MSTR, logs the transition in CST_STAT_HIST, and records a log message via UTIL_LOG, preventing changes if the customer status is 'X'."
+     },
+     {
+      "name": "CHK_CST_XFL",
+      "summary": "Evaluates customer classification attributes and determines an output flag ('Y', 'P', or 'N') based on type code, country code, and VAT number presence."
+     },
+     {
+      "name": "REBUILD_CST_IDX",
+      "summary": "Rebuilds the CST_IDX search table from non-closed ('X') customers in CST_MSTR by deleting existing records, inserting formatted search keys, and committing the transaction."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "A customer is assigned level 'G' if total invoice amount (inv_amt) within the last 12 months is at least 25000, or if total invoice amount is at least 10000 and the customer tenure is at least 5 years.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       17,
+       18
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "A customer is assigned level 'S' if not qualifying for 'G' and the 12-month invoice total is at least 5000.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       19,
+       20
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "A customer is assigned level 'B' if they do not qualify for levels 'G' or 'S', or if no invoice/master data is found.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       22,
+       25
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer status cannot be updated if current stat_cd is 'X'; an application error -20031 with message 'Customer <p_cst_id> is closed' is raised.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       41,
+       43
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When updating status, the old status, new status, change date (SYSDATE), and user (p_usr) are logged into CST_STAT_HIST and an informational message is sent to UTIL_LOG.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       51,
+       54
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Output flag p_xfl is set to 'Y' when typ_cd is 'K', ctry_cd is not 'BE', and vat_no is not null.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       70,
+       71
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Output flag p_xfl is set to 'P' when typ_cd is 'K', ctry_cd is not 'BE', and vat_no is null.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       72,
+       73
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Output flag p_xfl is set to 'N' when typ_cd is not 'K' or ctry_cd is 'BE'.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       74,
+       75
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When rebuilding index CST_IDX, only customers in CST_MSTR whose stat_cd is not 'X' are included, generating srch_key as UPPER(TRIM(nm)) || '#' || zip_cd.",
+      "implemented_in": "REBUILD_CST_IDX",
+      "evidence_lines": [
+       82,
+       85
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "UPD_CST_STAT selects and locks CST_MSTR row FOR UPDATE using p_cst_id.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 2,
+      "description": "UPD_CST_STAT checks if stat_cd equals 'X' and raises application error -20031 if true.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 3,
+      "description": "UPD_CST_STAT updates CST_MSTR stat_cd, upd_dt, and upd_usr.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 4,
+      "description": "UPD_CST_STAT records an audit entry in CST_STAT_HIST.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 5,
+      "description": "UPD_CST_STAT logs an informational event via UTIL_LOG.LOG_MSG.",
+      "implemented_in": "UPD_CST_STAT"
+     }
+    ],
+    "edge_cases": [
+     "In GET_CST_LVL, if the query matches no rows, NO_DATA_FOUND is handled and returns 'B'.",
+     "In GET_CST_LVL, if a customer has matching records but no invoices in the last 12 months, NVL(SUM(h.inv_amt), 0) returns 0.",
+     "In CHK_CST_XFL, if p_cst_id does not exist in CST_MSTR, an unhandled NO_DATA_FOUND exception will be raised.",
+     "In UPD_CST_STAT, if p_cst_id does not exist in CST_MSTR, an unhandled NO_DATA_FOUND exception will be raised by the SELECT ... FOR UPDATE."
+    ],
+    "open_questions": [
+     "REBUILD_CST_IDX is a private procedure that is never called within the package; should it be exposed in the package specification or called by another procedure?",
+     "REBUILD_CST_IDX issues an explicit COMMIT on line 86; is this intentional transaction management for batch processing?",
+     "What do level codes 'G', 'S', and 'B' returned by GET_CST_LVL represent functionally (e.g., Gold, Silver, Bronze)?",
+     "What do typ_cd 'K' and output flag values 'Y', 'P', and 'N' represent functionally in CHK_CST_XFL?"
+    ]
+   },
+   "doc": {
+    "source_complete": true,
+    "purpose": "Provides utilities for managing customer data, including calculating customer service levels, updating customer status codes with audit history, evaluating cross-border flags, and rebuilding a search index.",
+    "procedure_notes": [
+     {
+      "name": "GET_CST_LVL",
+      "summary": "Calculates and returns a customer's level code ('G', 'S', or 'B') based on total invoice amounts over the last 12 months and customer tenure in years."
+     },
+     {
+      "name": "UPD_CST_STAT",
+      "summary": "Updates a customer's status code in CST_MSTR, logs the transition in CST_STAT_HIST, and records a log message via UTIL_LOG, preventing changes if the customer status is 'X'."
+     },
+     {
+      "name": "CHK_CST_XFL",
+      "summary": "Evaluates customer classification attributes and determines an output flag ('Y', 'P', or 'N') based on type code, country code, and VAT number presence."
+     },
+     {
+      "name": "REBUILD_CST_IDX",
+      "summary": "Rebuilds the CST_IDX search table from non-closed ('X') customers in CST_MSTR by deleting existing records, inserting formatted search keys, and committing the transaction."
+     }
+    ],
+    "business_rules": [
+     {
+      "rule": "A customer is assigned level 'G' if total invoice amount (inv_amt) within the last 12 months is at least 25000, or if total invoice amount is at least 10000 and the customer tenure is at least 5 years.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       17,
+       18
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "A customer is assigned level 'S' if not qualifying for 'G' and the 12-month invoice total is at least 5000.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       19,
+       20
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "A customer is assigned level 'B' if they do not qualify for levels 'G' or 'S', or if no invoice/master data is found.",
+      "implemented_in": "GET_CST_LVL",
+      "evidence_lines": [
+       22,
+       25
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Customer status cannot be updated if current stat_cd is 'X'; an application error -20031 with message 'Customer <p_cst_id> is closed' is raised.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       41,
+       43
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When updating status, the old status, new status, change date (SYSDATE), and user (p_usr) are logged into CST_STAT_HIST and an informational message is sent to UTIL_LOG.",
+      "implemented_in": "UPD_CST_STAT",
+      "evidence_lines": [
+       51,
+       54
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Output flag p_xfl is set to 'Y' when typ_cd is 'K', ctry_cd is not 'BE', and vat_no is not null.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       70,
+       71
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Output flag p_xfl is set to 'P' when typ_cd is 'K', ctry_cd is not 'BE', and vat_no is null.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       72,
+       73
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "Output flag p_xfl is set to 'N' when typ_cd is not 'K' or ctry_cd is 'BE'.",
+      "implemented_in": "CHK_CST_XFL",
+      "evidence_lines": [
+       74,
+       75
+      ],
+      "confidence": "high"
+     },
+     {
+      "rule": "When rebuilding index CST_IDX, only customers in CST_MSTR whose stat_cd is not 'X' are included, generating srch_key as UPPER(TRIM(nm)) || '#' || zip_cd.",
+      "implemented_in": "REBUILD_CST_IDX",
+      "evidence_lines": [
+       82,
+       85
+      ],
+      "confidence": "high"
+     }
+    ],
+    "main_flow": [
+     {
+      "step": 1,
+      "description": "UPD_CST_STAT selects and locks CST_MSTR row FOR UPDATE using p_cst_id.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 2,
+      "description": "UPD_CST_STAT checks if stat_cd equals 'X' and raises application error -20031 if true.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 3,
+      "description": "UPD_CST_STAT updates CST_MSTR stat_cd, upd_dt, and upd_usr.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 4,
+      "description": "UPD_CST_STAT records an audit entry in CST_STAT_HIST.",
+      "implemented_in": "UPD_CST_STAT"
+     },
+     {
+      "step": 5,
+      "description": "UPD_CST_STAT logs an informational event via UTIL_LOG.LOG_MSG.",
+      "implemented_in": "UPD_CST_STAT"
+     }
+    ],
+    "edge_cases": [
+     "In GET_CST_LVL, if the query matches no rows, NO_DATA_FOUND is handled and returns 'B'.",
+     "In GET_CST_LVL, if a customer has matching records but no invoices in the last 12 months, NVL(SUM(h.inv_amt), 0) returns 0.",
+     "In CHK_CST_XFL, if p_cst_id does not exist in CST_MSTR, an unhandled NO_DATA_FOUND exception will be raised.",
+     "In UPD_CST_STAT, if p_cst_id does not exist in CST_MSTR, an unhandled NO_DATA_FOUND exception will be raised by the SELECT ... FOR UPDATE."
+    ],
+    "open_questions": [
+     "REBUILD_CST_IDX is a private procedure that is never called within the package; should it be exposed in the package specification or called by another procedure?",
+     "REBUILD_CST_IDX issues an explicit COMMIT on line 86; is this intentional transaction management for batch processing?",
+     "What do level codes 'G', 'S', and 'B' returned by GET_CST_LVL represent functionally (e.g., Gold, Silver, Bronze)?",
+     "What do typ_cd 'K' and output flag values 'Y', 'P', and 'N' represent functionally in CHK_CST_XFL?"
+    ]
+   },
+   "unit_docs": {}
+  },
+  {
+   "name": "ORD_PROC",
+   "ok": false,
+   "error": "ORD_PROC.CALC_DISC_PCT: Gemini API error 503 UNAVAILABLE: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+   "mode": null,
+   "source_hash": "1cc353c91a648bba47c83e0e37cba866a517fdb1a13ddfdf4a13c9dce042a2cd",
+   "metrics": {
+    "subprograms": 0,
+    "subprograms_with_note": 0,
+    "tables": 0,
+    "tables_on_page": 0,
+    "rules": 0,
+    "rules_valid_evidence": 0,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 0
+   },
+   "findings": [],
+   "calls": [],
+   "raw_doc": null,
+   "doc": null,
+   "unit_docs": {}
+  },
+  {
+   "name": "UTIL_LOG",
+   "ok": false,
+   "error": "UTIL_LOG: Gemini API error 429 RESOURCE_EXHAUSTED: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash, description: Generate content requests per day limit exceeded on Free Tier. See https://ai.google.dev/gemini-api/docs/rate-limits.\nPlease retry in 14h22m59.414512926s. (daily quota exhausted; not retrying)",
+   "mode": null,
+   "source_hash": "792de712f1960f9e20f2de864e29bde1ac45b5439ea27a3c99d854aa8c318819",
+   "metrics": {
+    "subprograms": 0,
+    "subprograms_with_note": 0,
+    "tables": 0,
+    "tables_on_page": 0,
+    "rules": 0,
+    "rules_valid_evidence": 0,
+    "faithfulness_violations": 0,
+    "dropped_items": 0,
+    "open_questions": 0
+   },
+   "findings": [],
+   "calls": [],
+   "raw_doc": null,
+   "doc": null,
+   "unit_docs": {}
+  }
+ ]
+}

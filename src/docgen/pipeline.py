@@ -14,16 +14,14 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
-import re
 import subprocess
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from html import unescape
 from pathlib import Path
 from typing import Literal
 
-from docgen.checks import CheckResult, check_page_coverage, run_checks
+from docgen.checks import CheckResult, check_page_coverage, run_checks, visible_text
 from docgen.config import Settings
 from docgen.extract import (
     PackageFiles,
@@ -47,7 +45,9 @@ from docgen.render import LABELS, RENDER_VERSION, PageMeta, page_title, render_p
 
 log = logging.getLogger(__name__)
 
-Status = Literal["published", "skipped", "failed"]
+# not_attempted: generation was needed, but the model had become unavailable
+# (overloaded / out of quota) earlier in the run, so it was not called.
+Status = Literal["published", "skipped", "failed", "not_attempted"]
 
 
 @dataclass
@@ -61,6 +61,7 @@ class PackageOutcome:
     checks: CheckResult | None = None
     calls: list[LLMCallRecord] = field(default_factory=list)
     error: str | None = None
+    provider_unavailable: bool = False
 
 
 @dataclass
@@ -77,7 +78,8 @@ class RunResult:
 
     @property
     def failed(self) -> list[PackageOutcome]:
-        return [o for o in self.outcomes if o.status == "failed"]
+        """Packages without an up-to-date page: failed or not attempted."""
+        return [o for o in self.outcomes if o.status in ("failed", "not_attempted")]
 
 
 def detect_commit(explicit: str | None = None) -> str:
@@ -157,7 +159,10 @@ def process_package(
     commit: str,
     force: bool,
     now: datetime,
+    llm_unavailable: str | None = None,
 ) -> PackageOutcome:
+    """Document and publish one package. With `llm_unavailable` set, unchanged
+    packages are still skipped, but the model is not called for changed ones."""
     outcome = PackageOutcome(label=_rel_label(files, root))
     try:
         extracted = extract_package(files, root=root, known_packages=known)
@@ -176,6 +181,11 @@ def process_package(
             log.info(
                 "%s: unchanged (cache key matches page %s); skipped", facts.name, existing.page_id
             )
+            return outcome
+        if llm_unavailable is not None:
+            outcome.status = "not_attempted"
+            outcome.error = f"not attempted: {llm_unavailable}"
+            log.warning("%s: %s", facts.name, outcome.error)
             return outcome
 
         gen = generate_package_doc(
@@ -197,7 +207,7 @@ def process_package(
             source_base_url=settings.source_base_url,
         )
         page = render_page(facts, checked.doc, meta)
-        checked.findings.extend(check_page_coverage(facts, _visible_text(page)))
+        checked.findings.extend(check_page_coverage(facts, visible_text(page)))
         outcome.checks = checked
         page = render_page(facts, checked.doc, meta, quality_notes=checked.quality_notes())
 
@@ -220,16 +230,13 @@ def process_package(
     except GenerationError as exc:
         outcome.calls = outcome.calls or exc.calls
         outcome.error = str(exc)
+        outcome.provider_unavailable = exc.provider_unavailable
         log.error("%s: generation failed: %s", outcome.label, exc)
     except Exception as exc:  # isolate: one bad package must not stop the run
         outcome.error = f"{type(exc).__name__}: {exc}"
         log.error("%s: failed: %s", outcome.label, outcome.error)
         log.debug("traceback", exc_info=True)
     return outcome
-
-
-def _visible_text(xhtml: str) -> str:
-    return unescape(re.sub(r"<[^>]+>", " ", xhtml))
 
 
 def run(
@@ -257,22 +264,28 @@ def run(
         ignored=selection.ignored,
     )
     known = known_package_names(root / settings.plsql_root)
+    llm_unavailable: str | None = None
     for files in selection.packages:
-        result.outcomes.append(
-            process_package(
-                files,
-                root=root,
-                settings=settings,
-                client=client,
-                prompts=prompts,
-                publisher=publisher,
-                cache=cache,
-                known=known,
-                commit=commit,
-                force=force,
-                now=now,
-            )
+        outcome = process_package(
+            files,
+            root=root,
+            settings=settings,
+            client=client,
+            prompts=prompts,
+            publisher=publisher,
+            cache=cache,
+            known=known,
+            commit=commit,
+            force=force,
+            now=now,
+            llm_unavailable=llm_unavailable,
         )
+        result.outcomes.append(outcome)
+        if outcome.provider_unavailable and llm_unavailable is None:
+            # Stop calling the model: more requests would fail the same way and,
+            # on a free tier, still count against the daily quota.
+            llm_unavailable = f"model unavailable after {outcome.name or outcome.label} failed"
+            log.warning("%s; not calling the model for the remaining packages", llm_unavailable)
     result.finished = datetime.now(UTC)
     return result
 

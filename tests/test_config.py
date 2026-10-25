@@ -87,3 +87,19 @@ def test_env_example_has_no_values(repo_root):
         if line.strip() and not line.lstrip().startswith("#"):
             key, _, value = line.partition("=")
             assert value == "", f"{key} must be empty in .env.example"
+
+
+def test_choice_values_are_case_insensitive(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "GEMINI")
+    monkeypatch.setenv("PUBLISH_MODE", " Rest ")
+    s = make()
+    assert (s.llm_provider, s.publish_mode) == ("gemini", "rest")
+
+
+def test_load_reports_invalid_values_without_echoing_them(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)  # no .env here
+    monkeypatch.setenv("LLM_PROVIDER", "secret-looking-value")
+    with pytest.raises(SettingsError) as exc:
+        Settings.load()
+    assert "LLM_PROVIDER" in str(exc.value)
+    assert "secret-looking-value" not in str(exc.value)

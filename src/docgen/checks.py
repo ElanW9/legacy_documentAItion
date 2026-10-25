@@ -19,12 +19,14 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from html import unescape
 from typing import Literal
 
 from docgen.models import PackageFacts, UnitDoc
 
 CheckName = Literal["faithfulness", "evidence", "coverage"]
 
+_TAG_RE = re.compile(r"<[^>]+>")
 _WORD_RE = re.compile(r"[A-Za-z][A-Za-z0-9_$#]*")
 # Candidate identifiers in prose: dotted names, names with "_", or ALL-CAPS words.
 _CANDIDATE_RE = re.compile(r"(?<![\w$#.])[A-Za-z][A-Za-z0-9_$#]*(?:\.[A-Za-z][A-Za-z0-9_$#]*)*")
@@ -34,6 +36,18 @@ _PROSE_CAPS = frozenset(
     {"AND", "API", "CSV", "DRAFT", "FAQ", "HTML", "HTTP", "ISO", "JSON", "NOT", "PDF", "SQL",
      "THE", "URL", "UTC", "VAT", "XML", "PLSQL"}
 )  # fmt: skip
+# Oracle language names (predefined exceptions, built-ins, SQL statement classes).
+# Describing what an unhandled SELECT INTO raises is correct and useful; the check
+# targets invented *repository* identifiers. Calibrated after eval run 1, see RESULTS.md.
+_ORACLE_BUILTINS = frozenset(
+    {"ACCESS_INTO_NULL", "CASE_NOT_FOUND", "COLLECTION_IS_NULL", "CURSOR_ALREADY_OPEN",
+     "DUP_VAL_ON_INDEX", "INVALID_CURSOR", "INVALID_NUMBER", "LOGIN_DENIED", "NO_DATA_FOUND",
+     "NOT_LOGGED_ON", "PROGRAM_ERROR", "ROWTYPE_MISMATCH", "SELF_IS_NULL", "STORAGE_ERROR",
+     "SUBSCRIPT_BEYOND_COUNT", "SUBSCRIPT_OUTSIDE_LIMIT", "SYS_INVALID_ROWID",
+     "TIMEOUT_ON_RESOURCE", "TOO_MANY_ROWS", "VALUE_ERROR", "ZERO_DIVIDE",
+     "SQLCODE", "SQLERRM", "ROWID", "ROWNUM", "DDL", "DML", "DCL", "TCL", "ACID"}
+)  # fmt: skip
+_ALLOWED = _PROSE_CAPS | _ORACLE_BUILTINS
 
 
 @dataclass(frozen=True)
@@ -79,7 +93,7 @@ def _is_identifier_like(token: str) -> bool:
 def unknown_identifiers(text: str, known: set[str]) -> list[str]:
     out: list[str] = []
     for token in _CANDIDATE_RE.findall(text):
-        if not _is_identifier_like(token) or token.upper() in _PROSE_CAPS:
+        if not _is_identifier_like(token) or token.upper() in _ALLOWED:
             continue
         parts = [p.upper() for p in token.split(".")]
         if all(p in known for p in parts):
@@ -204,6 +218,11 @@ def run_checks(facts: PackageFacts, body_text: str | None, doc: UnitDoc) -> Chec
         update={"procedure_notes": notes, "business_rules": rules, "main_flow": flow}
     )
     return CheckResult(cleaned, findings)
+
+
+def visible_text(xhtml: str) -> str:
+    """Rendered page text without markup (for coverage checks)."""
+    return unescape(_TAG_RE.sub(" ", xhtml))
 
 
 def check_page_coverage(facts: PackageFacts, page_text: str) -> list[Finding]:

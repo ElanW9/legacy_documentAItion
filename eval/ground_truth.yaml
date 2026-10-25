@@ -17,7 +17,11 @@
 # Valid expect_in fields: business_rules, open_questions, edge_cases,
 # main_flow, procedure_notes.
 
-version: 1
+# Changelog
+#   v2: T6 also accepts "represent" ("What do ... represent?"). Found when a
+#       correct v2-prompt answer scored as missed; applied to all saved runs
+#       via `python -m docgen.eval rescore` (see docs/RESULTS.md).
+version: 2
 traps:
   - id: T1-hidden-case-rule
     type: hidden_business_rule
@@ -121,7 +125,7 @@ traps:
     expect_in: [open_questions]
     match_all:
       - "xfl"
-      - "mean|stand for|abbreviat|cryptic|unclear|undocumented|not (explained|documented)|purpose|semantic|interpret"
+      - "mean|stand for|represent|abbreviat|cryptic|unclear|undocumented|not (explained|documented)|purpose|semantic|interpret"
 
   - id: T7-commented-out-block
     type: commented_out_logic
