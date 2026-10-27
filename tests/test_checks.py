@@ -97,3 +97,16 @@ def test_oracle_builtins_are_not_faithfulness_violations():
     facts, body, _ = _ord_proc()
     text = "An unhandled NO_DATA_FOUND or TOO_MANY_ROWS propagates; the DDL commits implicitly."
     assert unknown_identifiers(text, known_identifiers(facts, body)) == []
+
+
+def test_sql_keywords_are_not_faithfulness_violations():
+    # Phrases from the Nemotron v2 run that were flagged before calibration.
+    facts, body, _ = _ord_proc()
+    known = known_identifiers(facts, body)
+    text = (
+        "There is no COMMIT or ROLLBACK, so the caller owns the transaction. "
+        "The aggregate SELECT has no GROUP BY and always returns a row."
+    )
+    assert unknown_identifiers(text, known) == []
+    # Keywords are allowed one by one; an invented name next to them is still caught.
+    assert unknown_identifiers("COMMIT after ORD_ARCHIVE_LOG", known) == ["ORD_ARCHIVE_LOG"]

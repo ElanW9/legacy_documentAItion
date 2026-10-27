@@ -21,6 +21,26 @@
   "coverage_pct": 100.0,
   "notes_coverage_pct": 100.0,
   "tables_coverage_pct": 100.0,
+  "faithfulness_violations": 0,
+  "rules": 46,
+  "evidence_valid_pct": 100.0,
+  "traps_found": 7,
+  "traps_total": 9,
+  "trap_evidence_hits": 1,
+  "trap_evidence_total": 1,
+  "hallucinations": 0,
+  "llm_calls": 9,
+  "validation_retries": 0,
+  "tokens_in": 36405,
+  "tokens_out": 75059,
+  "latency_s": 1091.0
+ },
+ "original_summary": {
+  "packages": 4,
+  "failed": 0,
+  "coverage_pct": 100.0,
+  "notes_coverage_pct": 100.0,
+  "tables_coverage_pct": 100.0,
   "faithfulness_violations": 4,
   "rules": 46,
   "evidence_valid_pct": 100.0,
@@ -35,8 +55,7 @@
   "tokens_out": 75059,
   "latency_s": 1091.0
  },
- "original_summary": null,
- "rescored_at": null,
+ "rescored_at": "2026-10-27T19:13:48.091118Z",
  "traps": [
   {
    "id": "T1-hidden-case-rule",
@@ -477,18 +496,11 @@
     "tables_on_page": 4,
     "rules": 12,
     "rules_valid_evidence": 12,
-    "faithfulness_violations": 1,
+    "faithfulness_violations": 0,
     "dropped_items": 0,
     "open_questions": 6
    },
-   "findings": [
-    {
-     "check": "faithfulness",
-     "action": "flagged",
-     "location": "edge_cases[0]",
-     "message": "mentions 'GROUP', which does not appear in the source or static analysis"
-    }
-   ],
+   "findings": [],
    "calls": [
     {
      "unit": "CUST_MGMT",
@@ -813,30 +825,11 @@
     "tables_on_page": 2,
     "rules": 24,
     "rules_valid_evidence": 24,
-    "faithfulness_violations": 3,
+    "faithfulness_violations": 0,
     "dropped_items": 0,
     "open_questions": 30
    },
-   "findings": [
-    {
-     "check": "faithfulness",
-     "action": "flagged",
-     "location": "edge_cases[22]",
-     "message": "mentions 'COMMIT', which does not appear in the source or static analysis"
-    },
-    {
-     "check": "faithfulness",
-     "action": "flagged",
-     "location": "edge_cases[22]",
-     "message": "mentions 'ROLLBACK', which does not appear in the source or static analysis"
-    },
-    {
-     "check": "faithfulness",
-     "action": "flagged",
-     "location": "open_questions[25]",
-     "message": "mentions 'COMMIT', which does not appear in the source or static analysis"
-    }
-   ],
+   "findings": [],
    "calls": [
     {
      "unit": "ORD_PROC.CALC_DISC_PCT",

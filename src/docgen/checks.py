@@ -47,7 +47,22 @@ _ORACLE_BUILTINS = frozenset(
      "TIMEOUT_ON_RESOURCE", "TOO_MANY_ROWS", "VALUE_ERROR", "ZERO_DIVIDE",
      "SQLCODE", "SQLERRM", "ROWID", "ROWNUM", "DDL", "DML", "DCL", "TCL", "ACID"}
 )  # fmt: skip
-_ALLOWED = _PROSE_CAPS | _ORACLE_BUILTINS
+# SQL and PL/SQL keywords. "No COMMIT, so the caller owns the transaction" or "an
+# aggregate without GROUP BY" names language constructs, not repository objects.
+# Reserved words cannot be object names, so allowing them hides no invented
+# identifier. Calibrated after the Nemotron v2 run (4 false positives), see RESULTS.md.
+_SQL_KEYWORDS = frozenset(
+    {"ALTER", "BEGIN", "BULK", "CASE", "CLOSE", "COLLECT", "COMMIT", "COUNT", "CREATE",
+     "CURSOR", "DECLARE", "DEFAULT", "DELETE", "DISTINCT", "DROP", "ELSE", "ELSIF", "END",
+     "EXCEPTION", "EXECUTE", "EXISTS", "EXIT", "FETCH", "FOR", "FORALL", "FROM", "FUNCTION",
+     "GRANT", "GROUP", "HAVING", "IMMEDIATE", "INSERT", "INTO", "JOIN", "LOOP", "MAX",
+     "MERGE", "MIN", "NULL", "NVL", "OPEN", "ORDER", "OTHERS", "OUT", "PACKAGE", "PRAGMA",
+     "PROCEDURE", "RAISE", "RAISE_APPLICATION_ERROR", "RETURN", "RETURNING", "ROLLBACK",
+     "SAVEPOINT", "SELECT", "SET", "SUM", "SYSDATE", "SYSTIMESTAMP", "THEN", "TRIGGER",
+     "TRUNCATE", "TYPE", "UNION", "UPDATE", "USING", "VALUES", "VIEW", "WHEN", "WHERE",
+     "WHILE", "WITH", "AUTONOMOUS_TRANSACTION"}
+)  # fmt: skip
+_ALLOWED = _PROSE_CAPS | _ORACLE_BUILTINS | _SQL_KEYWORDS
 
 
 @dataclass(frozen=True)
