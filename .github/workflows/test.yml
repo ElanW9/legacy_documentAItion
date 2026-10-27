@@ -34,7 +34,9 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        # Not editable: tests run against the installed package, as the docs
+        # job does, so a file missing from the package fails here first.
+        run: python -m pip install ".[dev]"
       - name: Ruff lint
         run: ruff check --output-format=github .
       - name: Ruff format

@@ -72,7 +72,7 @@ def _commit_for_eval() -> str:
     commit = detect_commit()
     try:
         out = subprocess.run(
-            ["git", "status", "--porcelain", "--", "src", "prompts", "eval/ground_truth.yaml"],
+            ["git", "status", "--porcelain", "--", "src", "eval/ground_truth.yaml"],
             capture_output=True,
             text=True,
             check=True,

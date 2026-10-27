@@ -1,6 +1,6 @@
 """Prompt loading and user-message construction.
 
-Prompts live in `prompts/` at the repository root so they can be reviewed and
+Prompts live in `src/docgen/prompts/` as plain files so they can be reviewed and
 diffed like code. `PROMPT_VERSION` is the human-readable version that goes on
 every page and into eval results; the fingerprint (a hash of the prompt files)
 goes into the cache key so an edited prompt is never served from cache even if
@@ -17,7 +17,8 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
+# Shipped inside the package, so a normal (non-editable) install finds them too.
+PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
 
 @dataclass(frozen=True)
