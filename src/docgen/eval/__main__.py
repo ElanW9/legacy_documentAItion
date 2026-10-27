@@ -103,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         runs = load_runs(args.files or _results_files(args.results))
         md = comparison_markdown(runs)
         if args.out:
-            args.out.write_text(md + "\n", encoding="utf-8")
+            args.out.write_text(md + "\n", encoding="utf-8", newline="\n")
         print(md)
         return 0
 

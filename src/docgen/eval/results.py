@@ -117,7 +117,7 @@ class EvalRun(BaseModel):
 def save_run(run: EvalRun, directory: Path) -> Path:
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / f"{run.run_id}.json"
-    path.write_text(run.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    path.write_text(run.model_dump_json(indent=1) + "\n", encoding="utf-8", newline="\n")
     return path
 
 
