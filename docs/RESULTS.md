@@ -151,10 +151,27 @@ publishing separately from generation) against a Confluence Cloud free site:
 | Same run again | skipped: the page's cache key matched, no model call |
 | `--force` | same page updated as a new version, no duplicate |
 
+## CI on GitHub
+
+First runs on 2026-10-27:
+
+- **`test`**: about 20 s per Python version (3.12 and 3.14) and 10 s for
+  gitleaks. Waiting for a free runner can take minutes longer than the job.
+- **Pull request dry run**: the first attempt failed, because the prompts were
+  found relative to the source tree and the job installs the package normally.
+  Fixed by shipping the prompts inside the package. The `test` job now also
+  installs normally, so this kind of packaging error fails the tests first.
+- **`generate-docs` on main**: the first run stopped after 2 s with exit code 2,
+  because the repository secrets and variables were not set yet. The startup
+  check stopped it before any model call or Confluence request. After adding
+  them, a re-run of the same push succeeded with "No PL/SQL packages to
+  process": that push changed only workflow and script files.
+
 ## Pending
 
 - Gemini 3.8 Flash with prompt v2, complete (resume the partial run).
 - Gemini 3.8 Flash with prompt v2 and thinking level `low`: does less thinking
   cost trap detection, and how much latency does it save?
 - The synthesis fix for T3, if evaluated.
-- A first publish with real model output.
+- A first publish with real model output, ideally from CI after a change under
+  `plsql/`.
