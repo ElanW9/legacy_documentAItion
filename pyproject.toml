@@ -17,12 +17,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "pre-commit==4.7.0",
     "pytest==9.1.1",
     "ruff==0.17.2",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+# The prompts are part of the generator: install them with the code.
+docgen = ["prompts/VERSION", "prompts/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
