@@ -1,0 +1,14 @@
+# Local checks before each commit: `pre-commit install` once per clone.
+# The same checks run in CI (.github/workflows/test.yml), so skipping them
+# locally only moves the failure to the pull request.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      # Scans the staged changes; a detected secret blocks the commit.
+      - id: gitleaks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.2 # keep in step with ruff in pyproject.toml
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
